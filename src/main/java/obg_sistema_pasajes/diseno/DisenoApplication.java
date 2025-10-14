@@ -8,6 +8,7 @@ public class DisenoApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(DisenoApplication.class, args);
+		//DatosPrueba.cargar(); 
 	}
 
 }
