@@ -1,4 +1,5 @@
 package obg_sistema_pasajes.diseno.modelo;
+import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo;
 
 public class Tarifa {
     private int id;
