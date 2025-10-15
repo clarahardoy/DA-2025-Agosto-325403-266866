@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import obg_sistema_pasajes.diseno.modelo.entidad.Usuario;
 
 @RestController
 @RequestMapping("/menu")

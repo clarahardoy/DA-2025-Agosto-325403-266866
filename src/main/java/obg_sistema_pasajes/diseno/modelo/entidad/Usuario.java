@@ -1,12 +1,11 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 
-public class UsuarioPropietario {
+public abstract class Usuario {
     private String nombreCompleto;
-    private String password; 
-    private String cedula; 
+    private String password;
+    private String cedula;
 
-
-    public UsuarioPropietario(String nombreCompleto, String password, String cedula) {
+    public Usuario(String nombreCompleto, String password, String cedula) {
         this.nombreCompleto = nombreCompleto;
         this.password = password;
         this.cedula = cedula;
@@ -23,15 +22,18 @@ public class UsuarioPropietario {
     public String getCedula() {
         return cedula;
     }
-    
+
     @Override
     public String toString() {
         return nombreCompleto + " (" + cedula + ")";
     }
 
+    @Override
     public boolean equals(Object obj) {
-        UsuarioPropietario otro = (UsuarioPropietario) obj;
-        return this.cedula.equals(otro.cedula);
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Usuario otro = (Usuario) obj;
+        return this.cedula != null && this.cedula.equals(otro.cedula);
     }
 
     public void validar() throws IllegalArgumentException {

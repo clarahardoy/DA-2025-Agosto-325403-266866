@@ -1,6 +1,12 @@
 package obg_sistema_pasajes.diseno.modelo;
 
+import obg_sistema_pasajes.diseno.modelo.sistema.SistemaAcceso;
+
 public class Fachada {
+
+    private SistemaAcceso sAcceso = new SistemaAcceso();
+
+
     private static Fachada instancia; 
 
     //private SistemaClientes sistemaClientes;
