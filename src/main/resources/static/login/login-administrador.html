@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Login Administrador - Sistema de Peajes</title>
+		<link rel="stylesheet" href="../app.css" />
+		<link rel="stylesheet" href="login.css" />
+		<script src="../vistaWeb.js"></script>
+		<script src="../utilesVista.js"></script>
+	</head>
+	<body>
+		<div class="login-container">
+			<div class="header">
+				<div class="icon"></div>
+				<div>
+					<h1 class="title">Ingreso a la aplicación</h1>
+					<p class="subtitle">
+						Por favor ingrese con su cédula de identidad y contraseña.
+					</p>
+				</div>
+			</div>
+
+			<h2 id="titulo"></h2>
+			<form
+				id="formLogin"
+				action="/login"
+				method="post"
+				onsubmit="handleLogin(event)"
+			>
+				<div class="input-group">
+					<label for="cedula">Cédula de identidad</label>
+					<input
+						type="text"
+						id="cedula"
+						name="cedula"
+						placeholder="Ej: 41234567"
+						required
+						pattern="[0-9]+"
+						title="Solo números, sin puntos ni guiones"
+					/>
+					<div class="helper-text">Solo números, sin puntos ni guiones.</div>
+				</div>
+				<div class="input-group">
+					<label for="password">Contraseña</label>
+					<input
+						type="password"
+						id="password"
+						name="password"
+						placeholder="Ingrese su contraseña"
+						required
+					/>
+				</div>
+				<button type="submit">Ingresar</button>
+			</form>
+
+			<div class="footer">© 2025 - Acceso de administradores</div>
+		</div>
+
+		<script>
+			const TITULO_PAGINA = 'Administración';
+			const URL_SUBMIT = '/auth/login-admin';
+
+			document.addEventListener('DOMContentLoaded', function () {
+				document.getElementById('titulo').textContent = TITULO_PAGINA;
+			});
+
+			function handleLogin(event) {
+				event.preventDefault();
+				submit(URL_SUBMIT, serializarFormulario('formLogin'));
+			}
+
+			//La respuesta correcta del submit tiene la url de la vista siguiente
+			function mostrar_loginExitoso(urlDestino) {
+				window.location.href = urlDestino;
+			}
+
+			async function excepcionDeAplicacion(text) {
+				await mostrarMensaje(text);
+			}
+		</script>
+	</body>
+</html>
