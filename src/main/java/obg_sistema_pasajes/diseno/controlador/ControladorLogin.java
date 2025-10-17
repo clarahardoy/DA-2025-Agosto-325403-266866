@@ -7,16 +7,41 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpSession;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
+import obg_sistema_pasajes.diseno.modelo.Fachada;
+import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
+import obg_sistema_pasajes.diseno.modelo.entidad.Administradores;
 
 @RestController
 @RequestMapping("/auth")
 public class ControladorLogin {
 
-    @PostMapping("/login")
-    public List<Respuesta> login(HttpSession session, @RequestParam String usuario, @RequestParam String password) throws PeajeException {
-       //Usuario usuario = Fachada.getInstancia().login(usuario, password);
-       // if (usuario == null) throw new PeajeException("Credenciales incorrectas");
-       // session.setAttribute("usuario", usuario);
-       return Respuesta.lista(new Respuesta("Login exitoso", "menu.html"));
+    @PostMapping("/loginPropietario")
+    public List<Respuesta> loginPropietario(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) throws PeajeException {
+    Sesion sesion = Fachada.getInstancia().loginPropietario(cedula, password);
+
+       // si hay una sesion activa la cierro
+       logout(sesionHttp);
+
+       // guardo la sesion de la logica en la sesionHttp
+       sesionHttp.setAttribute("usuarioPropietario", sesion);
+       return Respuesta.lista(new Respuesta("loginExitoso", "menu.html"));
+    }
+
+    @PostMapping("/loginAdmin")
+    public List<Respuesta> loginAdministrador(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) throws PeajeException {
+        Administradores admin = Fachada.getInstancia().loginAdministrador(cedula, password);
+        // guardo el admin en la sesionHttp
+        sesionHttp.setAttribute("usuarioAdmin", admin);
+        return Respuesta.lista(new Respuesta("loginExitoso", "monitor-actividad.html"));
+    }
+
+    @PostMapping("/logout")
+    public List<Respuesta> logout(HttpSession sesionHttp) throws PeajeException {
+        Sesion sesion = (Sesion) sesionHttp.getAttribute("usuarioPropietario");
+        if (sesion != null) {
+            Fachada.getInstancia().logout(sesion);
+            sesionHttp.removeAttribute("usuarioPropietario");
+        }
+        return Respuesta.lista(new Respuesta("paginaLogin", "login.html"));
     }
 }
