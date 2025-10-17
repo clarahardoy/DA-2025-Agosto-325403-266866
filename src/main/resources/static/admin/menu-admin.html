@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Administrador - Principal</title>
+		<link rel="stylesheet" href="agenda.css" />
+		<script src="vistaWeb.js"></script>
+	</head>
+	<body>
+		<div class="sidebar">
+			<label id="nombreCompleto"> </label>
+			<button onclick="cargarContenido('transito.html')">
+				Emular Transito
+			</button>
+			<button onclick="cargarContenido('bonificaciones.html')">
+				Asignar Bonificaciones
+			</button>
+			<button onclick="cargarContenido('estado-propietario.html')">
+				Cambiar Estado de Propietario
+			</button>
+			<button onclick="logout()">Salir</button>
+		</div>
+		<div class="content">
+			<iframe
+				id="contenidoFrame"
+				src="transito.html"
+				frameborder="0"
+				style="width: 100%; height: 80vh"
+			></iframe>
+		</div>
+		<script>
+			urlIniciarVista = '/menu/vista-conectada';
+			urlCierreVista = '/auth/logout';
+
+			const spnNombreCompleto = document.getElementById('nombreCompleto');
+
+			function cargarContenido(pagina) {
+				document.getElementById('contenidoFrame').src = pagina;
+			}
+			function mostrar_nombreCompleto(nombreCompleto) {
+				spnNombreCompleto.innerHTML =
+					'Administrador: ' + nombreCompleto.toUpperCase();
+			}
+			function logout() {
+				submit(urlCierreVista);
+			}
+			function procesarErrorSubmit(status, text) {
+				if (status == 400) {
+					//El usuario no ha iniciado sesion
+					window.location.href = 'login-administrador.html';
+				}
+			}
+			function mostrar_paginaLogin(url) {
+				window.location.href = url;
+			}
+		</script>
+	</body>
+</html>

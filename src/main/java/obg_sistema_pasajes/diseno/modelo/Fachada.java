@@ -2,7 +2,7 @@ package obg_sistema_pasajes.diseno.modelo;
 
 import obg_sistema_pasajes.diseno.modelo.sistema.SistemaAcceso;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
-import obg_sistema_pasajes.diseno.modelo.entidad.Administradores;
+import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 
 import java.util.ArrayList;
 
@@ -41,7 +41,7 @@ public class Fachada {
         return sAcceso.loginPropietario(cedula, pwd);
     }
 
-    public Administradores loginAdministrador(String cedula, String pwd) throws PeajeException {
+    public Administrador loginAdministrador(String cedula, String pwd) throws PeajeException {
         return sAcceso.loginAdministrador(cedula, pwd);
     }
 

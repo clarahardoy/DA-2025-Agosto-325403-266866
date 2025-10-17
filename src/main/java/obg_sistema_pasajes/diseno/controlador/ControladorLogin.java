@@ -9,13 +9,13 @@ import jakarta.servlet.http.HttpSession;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.Fachada;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
-import obg_sistema_pasajes.diseno.modelo.entidad.Administradores;
+import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 
 @RestController
 @RequestMapping("/auth")
 public class ControladorLogin {
 
-    @PostMapping("/loginPropietario")
+    @PostMapping("/login-propietario")
     public List<Respuesta> loginPropietario(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) throws PeajeException {
     Sesion sesion = Fachada.getInstancia().loginPropietario(cedula, password);
 
@@ -27,9 +27,9 @@ public class ControladorLogin {
        return Respuesta.lista(new Respuesta("loginExitoso", "menu.html"));
     }
 
-    @PostMapping("/loginAdmin")
+    @PostMapping("/login-admin")
     public List<Respuesta> loginAdministrador(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) throws PeajeException {
-        Administradores admin = Fachada.getInstancia().loginAdministrador(cedula, password);
+        Administrador admin = Fachada.getInstancia().loginAdministrador(cedula, password);
         // guardo el admin en la sesionHttp
         sesionHttp.setAttribute("usuarioAdmin", admin);
         return Respuesta.lista(new Respuesta("loginExitoso", "monitor-actividad.html"));

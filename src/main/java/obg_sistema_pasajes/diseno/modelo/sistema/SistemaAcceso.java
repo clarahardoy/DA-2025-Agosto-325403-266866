@@ -4,17 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
-import obg_sistema_pasajes.diseno.modelo.entidad.Administradores;
+import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import obg_sistema_pasajes.diseno.modelo.entidad.Usuario;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 
 public class SistemaAcceso {
 
     private List<Propietario> propietarios = new ArrayList<>();
-    private List<Administradores> administradores = new ArrayList<>();
+    private List<Administrador> administradores = new ArrayList<>();
     private ArrayList<Sesion> sesiones = new ArrayList<>();
-
-
 
     public void agregarPropietario(String nombreCompleto, String password, String cedula,
             double saldoActual, double saldoMinimoAlerta) {
@@ -23,13 +21,10 @@ public class SistemaAcceso {
     }
 
     public void agregarAdministrador(String nombreCompleto, String password, String cedula) {
-        Administradores a = new Administradores(nombreCompleto, password, cedula);
+        Administrador a = new Administrador(nombreCompleto, password, cedula);
         administradores.add(a);
     }
 
-    
-
- 
     public Sesion loginPropietario(String cedula, String pwd) throws PeajeException {
         Sesion sesion = null;
         Propietario usuario = (Propietario) login(cedula, pwd, propietarios);
@@ -41,8 +36,8 @@ public class SistemaAcceso {
         throw new PeajeException("Login incorrecto");
     }
 
-    public Administradores loginAdministrador(String cedula, String pwd) throws obg_sistema_pasajes.diseno.exception.PeajeException {
-        Administradores admin = (Administradores) login(cedula, pwd, administradores);
+    public Administrador loginAdministrador(String cedula, String pwd) throws obg_sistema_pasajes.diseno.exception.PeajeException {
+        Administrador admin = (Administrador) login(cedula, pwd, administradores);
         if (admin == null) throw new PeajeException("Login incorrecto");
         return admin;
     }
@@ -65,5 +60,4 @@ public class SistemaAcceso {
     public void logout(Sesion s) {
         sesiones.remove(s);
     }
-
 }
