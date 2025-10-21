@@ -33,16 +33,19 @@ public class SistemaAcceso {
             sesiones.add(sesion);
             return sesion;
         }
-        throw new PeajeException("Login incorrecto");
+        // TODO: cambiar cuando implementemos el estado
+        if (usuario.getEstado().equals("Deshabilitado")) { 
+            throw new PeajeException("Usuario deshabilitado, no puede ingresar al sistema");
+        }
+        return null;
     }
 
-    public Administrador loginAdministrador(String cedula, String pwd) throws obg_sistema_pasajes.diseno.exception.PeajeException {
+    public Administrador loginAdministrador(String cedula, String pwd) throws PeajeException {
         Administrador admin = (Administrador) login(cedula, pwd, administradores);
-        if (admin == null) throw new PeajeException("Login incorrecto");
         return admin;
     }
 
-    private Usuario login(String cedula, String pwd, List<?> lista) {
+    private Usuario login(String cedula, String pwd, List<?> lista) throws PeajeException {
         Usuario usuario;
         for (Object o : lista) {
             usuario = (obg_sistema_pasajes.diseno.modelo.entidad.Usuario) o;
@@ -50,7 +53,7 @@ public class SistemaAcceso {
                 return usuario;
             }
         }
-        return null;
+        throw new PeajeException("Acceso denegado");
     }
 
     public ArrayList<Sesion> getSesiones() {

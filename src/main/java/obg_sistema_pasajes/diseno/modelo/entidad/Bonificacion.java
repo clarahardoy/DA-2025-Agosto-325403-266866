@@ -1,6 +1,6 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 
-public class Bonificacion {
+public abstract class Bonificacion {
     private String nombre;
 
     public Bonificacion(String nombre) {
@@ -14,5 +14,7 @@ public class Bonificacion {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    public abstract double calcularBonificacion(double monto);
     
 }
