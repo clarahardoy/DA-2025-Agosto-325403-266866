@@ -23,7 +23,7 @@ public class ControladorLogin {
 
        // guardo la sesion de la logica en la sesionHttp
        sesionHttp.setAttribute("usuarioPropietario", sesion);
-       return Respuesta.lista(new Respuesta("loginExitoso", "/propietario/menu.html"));
+       return Respuesta.lista(new Respuesta("loginExitoso", "/propietario/tablero.html"));
     }
 
     @PostMapping("/login-admin")

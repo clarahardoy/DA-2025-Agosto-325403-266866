@@ -3,25 +3,127 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Propietario - Tablero</title>
+		<title>Tablero de control del propietario</title>
 		<link rel="stylesheet" href="../app.css" />
+		<link rel="stylesheet" href="tablero.css" />
 		<script src="../vistaWeb.js"></script>
 	</head>
 	<body>
-		<div>Hello World</div>
+		<script src="../utilesVista.js"></script>
+
+		<div class="container">
+			<div class="header">
+				<h1>Tablero de control del propietario</h1>
+				<button class="btn-salir" onclick="logout()">Salir</button>
+			</div>
+
+			<div class="resumen-section">
+				<h2>Resumen del propietario</h2>
+				<div class="resumen-cards">
+					<div class="resumen-card">
+						<h6 class="resumen-card-label">NOMBRE COMPLETO</h6>
+						<h4><label id="nombreCompleto"> </label></h4>
+					</div>
+					<div class="resumen-card">
+						<h6 class="resumen-card-label">ESTADO</h6>
+						<h4><label id="estadoPropietario"> </label></h4>
+					</div>
+					<div class="resumen-card">
+						<h6 class="resumen-card-label">SALDO ACTUAL</h6>
+						<h4>
+							<label class="resumen-card-value" id="saldoActual"> </label>
+						</h4>
+					</div>
+				</div>
+			</div>
+
+			<!-- Bonificaciones y Vehículos -->
+			<div class="two-columns">
+				<div class="section-card">
+					<h3>Bonificaciones asignadas</h3>
+					<div id="listaBonificaciones">
+						<div class="sin-datos">No hay bonificaciones asignadas</div>
+					</div>
+				</div>
+
+				<div class="section-card">
+					<h3>Vehículos registrados</h3>
+					<div id="listaVehiculos">
+						<div class="sin-datos">No hay vehículos registrados</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tránsitos realizados -->
+			<div class="section-card" style="margin-bottom: 30px">
+				<h3>Tránsitos realizados</h3>
+				<div id="listaTransitos">
+					<div class="sin-datos">No hay tránsitos realizados</div>
+				</div>
+			</div>
+
+			<!-- Notificaciones del sistema -->
+			<div class="notificaciones-section">
+				<div class="notificaciones-header">
+					<h3>Notificaciones del sistema</h3>
+					<button class="btn-borrar" onclick="borrarNotificaciones()">
+						Borrar notificaciones
+					</button>
+				</div>
+				<div id="listaNotificaciones">
+					<div class="sin-datos">No hay notificaciones para borrar</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="../vistaWeb.js"></script>
+		<script src="../utilesVista.js"></script>
 		<script>
 			urlIniciarVista = '/tablero/vista-conectada';
 			urlCierreVista = '/auth/logout';
 
 			const spnNombreCompleto = document.getElementById('nombreCompleto');
+			const spnEstadoPropietario = document.getElementById('estadoPropietario');
+			const spnSaldoActual = document.getElementById('saldoActual');
+			const listaBonificaciones = document.getElementById(
+				'lista-bonificaciones'
+			);
+			const listaVehiculos = document.getElementById('lista-vehiculos');
+			const listaTransitos = document.getElementById('lista-transitos');
+			const listaNotificaciones = document.getElementById(
+				'lista-notificaciones'
+			);
 
 			function cargarContenido(pagina) {
 				document.getElementById('contenidoFrame').src = pagina;
 			}
 
 			function mostrar_nombreCompleto(nombreCompleto) {
-				spnNombreCompleto.innerHTML =
-					'Propietario: ' + nombreCompleto.toUpperCase();
+				spnNombreCompleto.innerHTML = nombreCompleto.toUpperCase();
+			}
+
+			function mostrar_estadoPropietario(estado) {
+				spnEstadoPropietario.innerHTML = estado.toUpperCase();
+			}
+
+			function mostrar_saldoActual(saldoActual) {
+				spnSaldoActual.innerHTML = saldoActual;
+			}
+
+			function mostrar_listaBonificaciones(bonificaciones) {
+				listaBonificaciones.innerHTML = crearListaDesdeJson(bonificaciones);
+			}
+
+			function mostrar_listaVehiculos(vehiculos) {
+				listaVehiculos.innerHTML = crearListaDesdeJson(vehiculos);
+			}
+
+			function mostrar_listaTransitos(transitos) {
+				listaTransitos.innerHTML = crearListaDesdeJson(transitos);
+			}
+
+			function mostrar_listaNotificaciones(notificaciones) {
+				listaNotificaciones.innerHTML = crearListaDesdeJson(notificaciones);
 			}
 
 			function logout() {
