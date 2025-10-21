@@ -6,7 +6,13 @@ public class DatosPrueba {
 
     Fachada fachada = Fachada.getInstancia();
 
-    //fachada.agregarPropietario(new Propietario("Juan", "1234567890"));
+    // precarga propietarios
+    fachada.agregarPropietario("Usuario Propietario", "prop.123", "23456789", 2000, 500);
+    fachada.agregarPropietario("Clara Hardoy", "test123", "52252441", 1000, 500);
+
+    // precarga administradores
+    fachada.agregarAdministrador("Usuario Administrador", "admin.123", "12345678");
+    fachada.agregarAdministrador("Mariano Rama", "test123", "52242443");
     }
     
 }

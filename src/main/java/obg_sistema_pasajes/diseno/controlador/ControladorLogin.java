@@ -17,14 +17,13 @@ public class ControladorLogin {
 
     @PostMapping("/login-propietario")
     public List<Respuesta> loginPropietario(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) throws PeajeException {
-    Sesion sesion = Fachada.getInstancia().loginPropietario(cedula, password);
-
+        Sesion sesion = Fachada.getInstancia().loginPropietario(cedula, password);
        // si hay una sesion activa la cierro
        logout(sesionHttp);
 
        // guardo la sesion de la logica en la sesionHttp
        sesionHttp.setAttribute("usuarioPropietario", sesion);
-       return Respuesta.lista(new Respuesta("loginExitoso", "menu.html"));
+       return Respuesta.lista(new Respuesta("loginExitoso", "/propietario/menu.html"));
     }
 
     @PostMapping("/login-admin")
@@ -32,16 +31,16 @@ public class ControladorLogin {
         Administrador admin = Fachada.getInstancia().loginAdministrador(cedula, password);
         // guardo el admin en la sesionHttp
         sesionHttp.setAttribute("usuarioAdmin", admin);
-        return Respuesta.lista(new Respuesta("loginExitoso", "monitor-actividad.html"));
+        return Respuesta.lista(new Respuesta("loginExitoso", "/admin/menu.html"));
     }
 
     @PostMapping("/logout")
     public List<Respuesta> logout(HttpSession sesionHttp) throws PeajeException {
-        Sesion sesion = (Sesion) sesionHttp.getAttribute("usuarioPropietario");
+        Sesion sesion = (Sesion) sesionHttp.getAttribute("usuarioAdmin");
         if (sesion != null) {
             Fachada.getInstancia().logout(sesion);
-            sesionHttp.removeAttribute("usuarioPropietario");
+            sesionHttp.removeAttribute("usuarioAdmin");
         }
-        return Respuesta.lista(new Respuesta("paginaLogin", "login.html"));
+        return Respuesta.lista(new Respuesta("paginaLogin", "/login/administrador.html"));
     }
 }

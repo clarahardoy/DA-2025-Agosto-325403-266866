@@ -3,18 +3,13 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Login Propietario - Sistema de Peajes</title>
+		<title>Login Administrador - Sistema de Peajes</title>
 		<link rel="stylesheet" href="../app.css" />
 		<link rel="stylesheet" href="login.css" />
 		<script src="../vistaWeb.js"></script>
-		<script src="../utilesVista.js"></script>
-		<style>
-			body {
-				background-color: #2563eb;
-			}
-		</style>
 	</head>
 	<body>
+		<script src="../utilesVista.js"></script>
 		<div class="login-container">
 			<div class="header">
 				<div class="icon"></div>
@@ -59,12 +54,12 @@
 				<button type="submit">Ingresar</button>
 			</form>
 
-			<div class="footer">© 2025 - Acceso de Propietarios</div>
+			<div class="footer">© 2025 - Acceso de administradores</div>
 		</div>
 
 		<script>
-			const TITULO_PAGINA = 'Propietarios';
-			const URL_SUBMIT = '/auth/login-propietario';
+			const TITULO_PAGINA = 'Administración';
+			const URL_SUBMIT = '/auth/login-admin';
 
 			document.addEventListener('DOMContentLoaded', function () {
 				document.getElementById('titulo').textContent = TITULO_PAGINA;
