@@ -79,51 +79,41 @@
 		<script src="../vistaWeb.js"></script>
 		<script src="../utilesVista.js"></script>
 		<script>
-			urlIniciarVista = '/tablero/vista-conectada';
+			urlIniciarVista = '/propietario/tablero';
 			urlCierreVista = '/auth/logout';
 
 			const spnNombreCompleto = document.getElementById('nombreCompleto');
 			const spnEstadoPropietario = document.getElementById('estadoPropietario');
 			const spnSaldoActual = document.getElementById('saldoActual');
 			const listaBonificaciones = document.getElementById(
-				'lista-bonificaciones'
+				'listaBonificaciones'
 			);
-			const listaVehiculos = document.getElementById('lista-vehiculos');
-			const listaTransitos = document.getElementById('lista-transitos');
+			const listaVehiculos = document.getElementById('listaVehiculos');
+			const listaTransitos = document.getElementById('listaTransitos');
 			const listaNotificaciones = document.getElementById(
-				'lista-notificaciones'
+				'listaNotificaciones'
 			);
 
 			function cargarContenido(pagina) {
 				document.getElementById('contenidoFrame').src = pagina;
 			}
 
-			function mostrar_nombreCompleto(nombreCompleto) {
-				spnNombreCompleto.innerHTML = nombreCompleto.toUpperCase();
-			}
-
-			function mostrar_estadoPropietario(estado) {
-				spnEstadoPropietario.innerHTML = estado.toUpperCase();
-			}
-
-			function mostrar_saldoActual(saldoActual) {
-				spnSaldoActual.innerHTML = saldoActual;
-			}
-
-			function mostrar_listaBonificaciones(bonificaciones) {
-				listaBonificaciones.innerHTML = crearListaDesdeJson(bonificaciones);
-			}
-
-			function mostrar_listaVehiculos(vehiculos) {
-				listaVehiculos.innerHTML = crearListaDesdeJson(vehiculos);
-			}
-
-			function mostrar_listaTransitos(transitos) {
-				listaTransitos.innerHTML = crearListaDesdeJson(transitos);
-			}
-
-			function mostrar_listaNotificaciones(notificaciones) {
-				listaNotificaciones.innerHTML = crearListaDesdeJson(notificaciones);
+			function mostrar_tableroData(data) {
+				spnNombreCompleto.innerHTML = data.nombreCompleto.toUpperCase();
+				spnEstadoPropietario.innerHTML = data.estado.toUpperCase();
+				spnSaldoActual.innerHTML = data.saldoActual;
+				
+				listaBonificaciones.innerHTML = data.bonificaciones && data.bonificaciones.length > 0 ? 
+					crearListaDesdeJson(data.bonificaciones) : '<div class="sin-datos">No hay bonificaciones asignadas</div>';
+				
+				listaVehiculos.innerHTML = data.vehiculos && data.vehiculos.length > 0 ? 
+					crearListaDesdeJson(data.vehiculos) : '<div class="sin-datos">No hay vehículos registrados</div>';
+				
+				listaTransitos.innerHTML = data.transitos && data.transitos.length > 0 ? 
+					crearListaDesdeJson(data.transitos) : '<div class="sin-datos">No hay tránsitos realizados</div>';
+				
+				listaNotificaciones.innerHTML = data.notificaciones && data.notificaciones.length > 0 ? 
+					crearListaDesdeJson(data.notificaciones) : '<div class="sin-datos">No hay notificaciones para borrar</div>';
 			}
 
 			function logout() {

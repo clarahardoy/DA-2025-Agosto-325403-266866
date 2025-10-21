@@ -28,10 +28,13 @@ public class ControladorLogin {
 
     @PostMapping("/login-admin")
     public List<Respuesta> loginAdministrador(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) throws PeajeException {
+        if(sesionHttp.getAttribute("usuarioAdmin") != null){
+         return Respuesta.lista(new Respuesta("yaLogueado", "/admin/menu.html"));
+        }
         Administrador admin = Fachada.getInstancia().loginAdministrador(cedula, password);
         // guardo el admin en la sesionHttp
         sesionHttp.setAttribute("usuarioAdmin", admin);
-        return Respuesta.lista(new Respuesta("loginExitoso", "/admin/menu.html"));
+        return Respuesta.lista(new Respuesta("loginExitoso", "/admin/menu.html"));  
     }
 
     @PostMapping("/logout")
