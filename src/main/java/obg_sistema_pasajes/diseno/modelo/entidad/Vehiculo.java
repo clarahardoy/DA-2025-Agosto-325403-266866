@@ -5,6 +5,7 @@ public class Vehiculo {
     private String modelo;
     private String color;
     private CategoriaVehiculo categoria;
+    private Propietario propietario; // Tiene id o propitario asociado??
 
     public Vehiculo(String matricula, String modelo, String color, CategoriaVehiculo categoria) {
         this.matricula = matricula;
@@ -25,8 +26,18 @@ public class Vehiculo {
         return color;
     }
 
+    //---------
     public CategoriaVehiculo getCategoria() {
         return categoria;
+    }
+
+    public Propietario getPropietario() {
+        return propietario; 
+    }
+    //---------
+
+    public void setPropietario(Propietario propietario) {
+        this.propietario = propietario;
     }
 
     public void setMatricula(String matricula) {

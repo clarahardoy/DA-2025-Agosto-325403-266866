@@ -63,4 +63,14 @@ public class SistemaAcceso {
     public void logout(Sesion s) {
         sesiones.remove(s);
     }
+
+    public Propietario obtenerPropietarioPorCedula(String cedula) {
+        for (Propietario p : propietarios) {
+            if (p.getCedula() != null && p.getCedula().equals(cedula)) {
+                return p;
+            }
+        }
+        return null;
+    }
+   
 }

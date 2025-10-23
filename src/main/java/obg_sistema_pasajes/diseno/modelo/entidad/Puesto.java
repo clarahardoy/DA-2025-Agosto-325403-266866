@@ -1,27 +1,39 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 
-public class Puesto {
-    private int nombre;
-    private int direccion;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Puesto(int nombre, int direccion) {
+public class Puesto {
+    private String nombre;
+    private String direccion;
+    private List<Tarifa> tarifas = new ArrayList<>();
+
+    public Puesto(String nombre, String direccion) {
         this.nombre = nombre;
         this.direccion = direccion;
     }
 
-    public int getNombre() {
+    public String getNombre() {
         return nombre;
     }
 
-    public int getDireccion() {
+    public String getDireccion() {
         return direccion;
     }
 
-    public void setNombre(int nombre) {
+    public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-    public void setDireccion(int direccion) {
+    public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public List<Tarifa> getTarifas() {
+        return tarifas;
+    }
+
+    public void agregarTarifa(Tarifa t) {
+        tarifas.add(t);
     }
 }
