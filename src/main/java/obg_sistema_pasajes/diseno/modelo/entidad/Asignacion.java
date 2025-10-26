@@ -3,11 +3,15 @@ import java.util.Date;
 
 public class Asignacion {
     private Date fechaAsignada;
+    //private Propietario propietario;
+    private Bonificacion bonificacion;
+    private Puesto puesto;
     
-    public Asignacion(Date fechaAsignada) {
-        this.fechaAsignada = fechaAsignada;
+    public Asignacion(Bonificacion bonificacion, Puesto puesto) {
+        this.bonificacion = bonificacion;
+        this.puesto = puesto;
+        this.fechaAsignada = new Date(); // Fecha actual
     }
-
     public Date getFechaAsignada() {
         return fechaAsignada;
     }
@@ -16,4 +20,14 @@ public class Asignacion {
         this.fechaAsignada = fechaAsignada;
     }
 
+    public Bonificacion getBonificacion() {
+        return bonificacion;
+    }
+
+    public Puesto getPuesto() {
+        return puesto;
+    }
+
 }
+
+

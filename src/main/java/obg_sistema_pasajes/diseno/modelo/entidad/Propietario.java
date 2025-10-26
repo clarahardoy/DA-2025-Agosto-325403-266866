@@ -85,7 +85,7 @@ public class Propietario extends Usuario {
         dto.vehiculos.add(new VehiculoDto(v.getMatricula(), v.getModelo(), v.getColor(), categoriaNombre));
     }
     for (Transito t : this.transitos) {
-        dto.transitos.add(new TransitoDto(t.getMontoBonificado()));
+        dto.transitos.add(new TransitoDto());
     } 
     for (Notificacion n : this.notificaciones) {
         dto.notificaciones.add(new NotificacionDto(n.getMensaje()));
@@ -96,6 +96,22 @@ public class Propietario extends Usuario {
 
     public void borrarNotificaciones() {
     this.notificaciones.clear();
+    }
+
+
+
+
+     public void descontarSaldo(double monto) {
+        this.saldoActual -= monto;
+    }
+
+    public Bonificacion getBonificacionParaPuesto(Puesto puesto) {
+        for (Asignacion asignacion : bonificacionesAsignadas) {
+            if (asignacion.getPuesto().equals(puesto)) {
+                return asignacion.getBonificacion();
+            }
+        }
+        return null;
     }
 
     // mantener validar del padre (si se desea extender, sobreescribir)

@@ -1,5 +1,7 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 
+import java.util.List;
+
 public abstract class Bonificacion {
     private String nombre;
 
@@ -15,6 +17,16 @@ public abstract class Bonificacion {
         this.nombre = nombre;
     }
 
-    public abstract double calcularBonificacion(double monto);
+    public double aplicarBonificacion(double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy) {
+        if (puedeAplicarBonificacion(vehiculo, transitosHoy)) {
+            return calcularMontoConDescuento(montoTarifa, vehiculo, transitosHoy);
+        }
+        return montoTarifa;
+    }
+
+    
+    public abstract boolean puedeAplicarBonificacion(Vehiculo vehiculo, List<Transito> transitosHoy);
+    public abstract double calcularMontoConDescuento(double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy);
     
 }
+
