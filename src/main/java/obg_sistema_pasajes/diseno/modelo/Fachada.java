@@ -77,6 +77,10 @@ public class Fachada {
     public java.util.List<Tarifa> obtenerTarifasPuesto(String nombrePuesto) {
         return SPuesto.obtenerTarifasPuesto(nombrePuesto);
     }
+    
+    public Puesto obtenerPuestoPorNombre(String nombrePuesto) {
+        return SPuesto.obtenerPuestoPorNombre(nombrePuesto);
+    }
 
 
 
@@ -101,16 +105,6 @@ public class Fachada {
     }
 
     public void asignarBonificacion(String cedula, String nombreBonificacion, String nombrePuesto) throws PeajeException {
-        Propietario propietario = sAcceso.obtenerPropietarioPorCedula(cedula);
-        if (propietario == null) {
-            throw new PeajeException("No existe el propietario");
-        }
-    
-        Puesto puesto = SPuesto.obtenerPuestoPorNombre(nombrePuesto);
-        if (puesto == null) {
-            throw new PeajeException("Debe especificar un puesto");
-        }   
-    
-        SBonificacion.asignarBonificacion(propietario, nombreBonificacion, puesto);
+        SBonificacion.asignarBonificacion(cedula, nombreBonificacion, nombrePuesto);
     }
 }

@@ -113,20 +113,32 @@ public class Propietario extends Usuario {
 
     public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
         // Validar que el propietario esté habilitado
-        if (!this.estado.getNombre().equals("Habilitado")) {
+        if (estaDeshabilitado()) {
             throw new PeajeException("El propietario esta deshabilitado. No se pueden asignar bonificaciones");
         }
 
         // Verificar si ya tiene una bonificación para ese puesto
-        for (Asignacion asignacion : this.bonificacionesAsignadas) {
-            if (asignacion.getPuesto().equals(puesto)) {
-                throw new PeajeException("Ya tiene una bonificación asignada para ese puesto");
-            }
+        if (tieneBonificacionEnPuesto(puesto)) {
+            throw new PeajeException("Ya tiene una bonificación asignada para ese puesto");
         }
 
         // Crear y asignar la nueva bonificación
         Asignacion nuevaAsignacion = new Asignacion(bonificacion, puesto);
         this.bonificacionesAsignadas.add(nuevaAsignacion);
+    }
+
+
+     public boolean estaDeshabilitado() { 
+        return estado.getNombre().equals("Deshabilitado"); 
+    }
+
+    public boolean tieneBonificacionEnPuesto(Puesto puesto) {
+       for (Asignacion asignacion : this.getBonificacionesAsignadas()) {
+            if (asignacion.getPuesto().equals(puesto)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Bonificacion getBonificacionParaPuesto(Puesto puesto) {

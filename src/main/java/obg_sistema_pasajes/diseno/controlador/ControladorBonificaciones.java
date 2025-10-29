@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.Fachada;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
+import obg_sistema_pasajes.diseno.modelo.entidad.Asignacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Bonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
 import obg_sistema_pasajes.diseno.dto.BonificacionDto;
@@ -50,18 +51,14 @@ public class ControladorBonificaciones {
         }
         
         // Preparar datos del propietario
-        String nombre = propietario.getNombreCompleto();
-        String estado = propietario.getEstado().getNombre();
         List<String> bonificacionesAsignadas = new ArrayList<>();
-        for (var asignacion : propietario.getBonificacionesAsignadas()) {
-            bonificacionesAsignadas.add(String.format("%s - %s", 
-                asignacion.getBonificacion().getNombre(),
-                asignacion.getPuesto().getNombre()));
+        for (Asignacion asignacion : propietario.getBonificacionesAsignadas()) {
+            bonificacionesAsignadas.add(asignacion.getBonificacion().getNombre() + " - " + asignacion.getPuesto().getNombre());
         }
         
         return Respuesta.lista(
-            new Respuesta("propietarioNombre", nombre),
-            new Respuesta("propietarioEstado", estado),
+            new Respuesta("propietarioNombre", propietario.getNombreCompleto()),
+            new Respuesta("propietarioEstado", propietario.getEstado().getNombre()),
             new Respuesta("bonificacionesAsignadas", bonificacionesAsignadas)
         );
     }
