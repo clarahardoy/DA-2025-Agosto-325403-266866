@@ -32,4 +32,11 @@ public class SistemaPuestos {
         }
         return new ArrayList<>();
     }
+
+    public Puesto obtenerPuestoPorNombre(String nombrePuesto) {
+        for (Puesto p : puestos) {
+            if (p.getNombre().equals(nombrePuesto)) return p;
+        }
+        return null;
+    }
 }

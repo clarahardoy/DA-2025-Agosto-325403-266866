@@ -3,14 +3,17 @@ package obg_sistema_pasajes.diseno.modelo;
 import obg_sistema_pasajes.diseno.modelo.sistema.SistemaAcceso;
 import obg_sistema_pasajes.diseno.modelo.sistema.SistemaPuestos;
 import obg_sistema_pasajes.diseno.modelo.sistema.SistemaVehiculo;
+import obg_sistema_pasajes.diseno.modelo.sistema.SistemaBonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Tarifa;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
+import obg_sistema_pasajes.diseno.modelo.entidad.Bonificacion;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 
@@ -19,7 +22,7 @@ public class Fachada {
     private SistemaAcceso sAcceso = new SistemaAcceso();
     private SistemaPuestos SPuesto = new SistemaPuestos();
     private SistemaVehiculo SVehiculo = new SistemaVehiculo();
-
+    private SistemaBonificacion SBonificacion = new SistemaBonificacion();
 
     private static Fachada instancia = new Fachada();
     
@@ -79,7 +82,35 @@ public class Fachada {
 
     //-----------------VEHICULOS-----------------
     public void agregarVehiculoAPropietario(String cedula, String matricula, String modelo, String color, CategoriaVehiculo categoria) {
-        Propietario p = sAcceso.obtenerPropietarioPorCedula(cedula);
+        Propietario p = obtenerPropietarioPorCedula(cedula);
         if (p != null) SVehiculo.agregarVehiculoAPropietario(p, matricula, modelo, color, categoria);
+    }
+
+    //-----------------PROPIETARIOS-----------------
+    public Propietario obtenerPropietarioPorCedula(String cedula) {
+        return sAcceso.obtenerPropietarioPorCedula(cedula);
+    }
+
+    //-----------------BONIFICACIONES-----------------
+    public void inicializarBonificaciones() {
+        SBonificacion.inicializarBonificaciones();
+    }
+
+    public List<Bonificacion> listarBonificaciones() {
+        return SBonificacion.listarBonificaciones();
+    }
+
+    public void asignarBonificacion(String cedula, String nombreBonificacion, String nombrePuesto) throws PeajeException {
+        Propietario propietario = sAcceso.obtenerPropietarioPorCedula(cedula);
+        if (propietario == null) {
+            throw new PeajeException("No existe el propietario");
+        }
+    
+        Puesto puesto = SPuesto.obtenerPuestoPorNombre(nombrePuesto);
+        if (puesto == null) {
+            throw new PeajeException("Debe especificar un puesto");
+        }   
+    
+        SBonificacion.asignarBonificacion(propietario, nombreBonificacion, puesto);
     }
 }

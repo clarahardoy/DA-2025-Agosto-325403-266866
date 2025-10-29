@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public class BonificacionTrabajador extends Bonificacion {
     
-    public BonificacionTrabajador(int id, String nombre) {
+    public BonificacionTrabajador(String nombre) {
         super(nombre);
     }
 

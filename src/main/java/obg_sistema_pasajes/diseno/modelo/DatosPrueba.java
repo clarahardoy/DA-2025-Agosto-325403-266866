@@ -13,6 +13,14 @@ public class DatosPrueba {
     // precarga administradores
     fachada.agregarAdministrador("Usuario Administrador", "admin.123", "12345678");
     fachada.agregarAdministrador("Mariano Rama", "test123", "52242443");
+
+    // precarga puestos
+    fachada.agregarPuesto("Puesto 204 - Ruta Interbalnearia", "Km 204 Ruta IB");
+    fachada.agregarPuesto("Puesto 156 - Ruta 1", "Km 156 Ruta 1");
+    fachada.agregarPuesto("Puesto 73 - Ruta 5", "Km 73 Ruta 5");
+
+    // inicializar bonificaciones
+    fachada.inicializarBonificaciones();
     }
     
 }

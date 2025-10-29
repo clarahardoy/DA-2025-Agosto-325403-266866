@@ -4,7 +4,7 @@ import java.util.List;
 
 public class BonificacionFrecuente extends Bonificacion {
     
-    public BonificacionFrecuente(int id, String nombre) {
+    public BonificacionFrecuente(String nombre) {
         super(nombre);
     }
 

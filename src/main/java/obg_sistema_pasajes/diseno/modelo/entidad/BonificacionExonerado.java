@@ -4,7 +4,7 @@ import java.util.List;
 
 public class BonificacionExonerado extends Bonificacion {
     
-    public BonificacionExonerado(int id, String nombre) {
+    public BonificacionExonerado(String nombre) {
         super(nombre);
     }
 

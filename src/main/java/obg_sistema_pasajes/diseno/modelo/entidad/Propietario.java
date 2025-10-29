@@ -2,6 +2,7 @@ package obg_sistema_pasajes.diseno.modelo.entidad;
 
 import java.util.ArrayList;
 import java.util.List;
+import obg_sistema_pasajes.diseno.exception.PeajeException;
 
 import obg_sistema_pasajes.diseno.dto.AsignacionDto;
 import obg_sistema_pasajes.diseno.dto.NotificacionDto;
@@ -103,6 +104,29 @@ public class Propietario extends Usuario {
 
      public void descontarSaldo(double monto) {
         this.saldoActual -= monto;
+    }
+
+
+
+
+    //-------------------------------
+
+    public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
+        // Validar que el propietario esté habilitado
+        if (!this.estado.getNombre().equals("Habilitado")) {
+            throw new PeajeException("El propietario esta deshabilitado. No se pueden asignar bonificaciones");
+        }
+
+        // Verificar si ya tiene una bonificación para ese puesto
+        for (Asignacion asignacion : this.bonificacionesAsignadas) {
+            if (asignacion.getPuesto().equals(puesto)) {
+                throw new PeajeException("Ya tiene una bonificación asignada para ese puesto");
+            }
+        }
+
+        // Crear y asignar la nueva bonificación
+        Asignacion nuevaAsignacion = new Asignacion(bonificacion, puesto);
+        this.bonificacionesAsignadas.add(nuevaAsignacion);
     }
 
     public Bonificacion getBonificacionParaPuesto(Puesto puesto) {
