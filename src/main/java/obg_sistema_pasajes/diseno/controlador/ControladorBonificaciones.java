@@ -20,7 +20,7 @@ import obg_sistema_pasajes.diseno.dto.BonificacionDto;
 @RequestMapping("/bonificaciones") 
 public class ControladorBonificaciones {
     
-    @PostMapping("/vista-conectada")
+    @PostMapping("/vistaConectada")
     public List<Respuesta> obtenerDatos() {
         // Obtener las bonificaciones y puestos definidos
         List<Bonificacion> bonificaciones = Fachada.getInstancia().listarBonificaciones();

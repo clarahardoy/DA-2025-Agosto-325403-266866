@@ -84,7 +84,7 @@
       }
     `;
 
-	// Insertar el CSS en el documento
+	/* Insertar el CSS en el documento  
 	const styleSheet = document.createElement('style');
 	styleSheet.type = 'text/css';
 	styleSheet.innerText = estiloCSS;
@@ -92,6 +92,30 @@
 
 	// Insertar el HTML del cuadro de diálogo en el cuerpo de la página
 	document.body.insertAdjacentHTML('beforeend', dialogoHTML);
+	*/
+
+		// Insertar el CSS en el documento (puede hacerse inmediatamente)
+		const styleSheet = document.createElement('style');
+		styleSheet.type = 'text/css';
+		styleSheet.innerText = estiloCSS;
+		document.head.appendChild(styleSheet);
+
+		
+		// Insertar el HTML del cuadro de diálogo en el cuerpo de la página
+		// Si este script se incluye en el <head> document.body puede ser null,---
+		// por eso deferimos la inserción hasta DOMContentLoaded cuando sea necesario. Esto es nuevo--------------------------------------------------------------------
+		function insertarDialogos() {
+			if (document.body) {
+				document.body.insertAdjacentHTML('beforeend', dialogoHTML);
+			}
+		}
+
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', insertarDialogos);
+		} else {
+			insertarDialogos();
+		}
+		//-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	// Variable para almacenar la respuesta
 	let respuestaUsuario = null;

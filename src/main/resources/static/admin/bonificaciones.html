@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Asignar Bonificaciones</title>
   <link rel="stylesheet" href="../app.css" />
-  <script src="../vistaWeb.js"></script>
   <script src="../utilesVista.js"></script>
+  <script src="../vistaWeb.js"></script>
   <link rel="stylesheet" href="bonificacion.css" />
 
   <style>
@@ -84,7 +84,7 @@
   </div>
 
   <script>
-    urlIniciarVista = '/bonificaciones/vista-conectada';
+    urlIniciarVista = '/bonificaciones/vistaConectada';
 
     function mostrar_bonificacionesDefinidas(bonificaciones) {
       const select = document.getElementById('bonificacion');
@@ -171,6 +171,7 @@
     }
 
     async function excepcionDeAplicacion(text) {
+      console.log("entro a excepcionDeAplicacion");
 				await mostrarMensaje(text);
 			}
   </script>

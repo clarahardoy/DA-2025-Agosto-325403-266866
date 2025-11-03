@@ -12,7 +12,7 @@ import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 
 public class ControladorAdministrador {
 
-    @PostMapping("/vista-conectada")
+    @PostMapping("/vistaConectada")
     public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin") Administrador admin){
 
          return Respuesta.lista(

@@ -12,6 +12,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> manejarExcepcion(PeajeException e) {
         //299 porque se produjo curso alternativo
         //endpoints tienen que tirar excepciones de tipo PeajeException
-        return ResponseEntity.status(299).body("Error: " + e.getMessage());
+        // return ResponseEntity.status(299).body("Error: " + e.getMessage()); ------------------------------------------------------------
+        // Devolver sólo el mensaje para que la vista muestre exactamente el texto esperado
+        return ResponseEntity.status(299).body(e.getMessage());
     }
 }
