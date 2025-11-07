@@ -10,10 +10,30 @@ import jakarta.servlet.http.HttpSession;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
+import observador.Observable;
+import observador.Observador;
+import obg_sistema_pasajes.diseno.ConexionNavegador;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/propietario")
-public class ControladorPropietario {
+public class ControladorPropietario implements Observador{
+
+    private Propietario propietario;
+    private final ConexionNavegador conexionNavegador;
+
+    public ControladorPropietario(@Autowired ConexionNavegador conexionNavegador){
+        this.conexionNavegador = conexionNavegador;
+    }
+
+    @GetMapping(value = "/registrarSSE", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter registrarSSE() {
+        conexionNavegador.conectarSSE();
+        return conexionNavegador.getConexionSSE();
+    }
 
     @PostMapping("/tablero")
     public List<Respuesta> obtenerTablero(HttpSession sesionHttp) throws PeajeException{
@@ -24,6 +44,31 @@ public class ControladorPropietario {
         Propietario p = (Propietario) sesion.getUsuario();
         Object dto = p.obtenerTableroDto();
         return Respuesta.lista(new Respuesta("tableroData", dto));
+    }
+
+    @PostMapping("/vistaConectada")
+    public List<Respuesta> inicializarVista(HttpSession sesionHttp) throws PeajeException{
+        Sesion sesion = (Sesion) sesionHttp.getAttribute("usuarioPropietario");
+        if(sesion == null) throw new PeajeException("Usuario no autenticado");
+
+        if(propietario!=null) propietario.quitarObservador(this);
+        propietario = (Propietario) sesion.getUsuario();
+        propietario.agregarObservador(this);
+
+        return Respuesta.lista(new Respuesta("tableroData", propietario.obtenerTableroDto()));
+    }
+
+    @PostMapping("/vistaCerrada")
+    public void salir(){
+        if(propietario!=null) propietario.quitarObservador(this);
+    }
+
+    @Override
+    public void actualizar(Object evento, Observable origen) {
+        if(evento!=null && evento.equals(Propietario.Eventos.cambioBonificaciones)){
+            Propietario p = (Propietario) origen;
+            conexionNavegador.enviarJSON(Respuesta.lista(new Respuesta("tableroData", p.obtenerTableroDto())));
+        }
     }
 
     @PostMapping("/borrar-notificaciones")

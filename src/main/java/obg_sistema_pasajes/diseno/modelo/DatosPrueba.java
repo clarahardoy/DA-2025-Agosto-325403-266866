@@ -44,8 +44,10 @@ public class DatosPrueba {
     fachada.agregarVehiculoAPropietario("23456789", "DEF9012", "Honda Civic", "Rojo", new CategoriaVehiculo(NombreCategoria.AUTO));
     fachada.agregarVehiculoAPropietario("52252441", "CHA1234", "Camioneta Nexxus", "Negro", new CategoriaVehiculo(NombreCategoria.CAMIONETA));
 
-    // inicializar bonificaciones
-    fachada.inicializarBonificaciones();
+    // precarga bonificaciones (agregar las 3 al sistema por nombre)
+    fachada.agregarBonificacion("Bonificación trabajador");
+    fachada.agregarBonificacion("Bonificación frecuente");
+    fachada.agregarBonificacion("Bonificación exonerado");
     }
     
 }

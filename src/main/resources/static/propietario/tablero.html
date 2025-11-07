@@ -7,11 +7,12 @@
 		<link rel="stylesheet" href="../app.css" />
 		<link rel="stylesheet" href="tablero.css" />
 		<script src="../vistaWeb.js"></script>
+		<script src="../sse.js"></script>
 	</head>
 	<body>
 		<script src="../utilesVista.js"></script>
 
-		<div class="container">
+		<div class="container" style="display:none">
 			<div class="header">
 				<h1>Tablero de control del propietario</h1>
 				<button class="btn-salir" onclick="logout()">Salir</button>
@@ -79,8 +80,10 @@
 		<script src="../vistaWeb.js"></script>
 		<script src="../utilesVista.js"></script>
 		<script>
-			urlIniciarVista = '/propietario/tablero';
-			urlCierreVista = '/auth/logout';
+			urlIniciarVista = '/propietario/vistaConectada';
+			// El endpoint en el controlador es /propietario/vistaCerrada (metodo salir()), usar esa ruta para cerrar la vista
+			urlCierreVista = '/propietario/vistaCerrada';
+			urlRegistroSSE = '/propietario/registrarSSE';
 
 			const spnNombreCompleto = document.getElementById('nombreCompleto');
 			const spnEstadoPropietario = document.getElementById('estadoPropietario');
@@ -103,21 +106,80 @@
 				spnEstadoPropietario.innerHTML = data.estado.toUpperCase();
 				spnSaldoActual.innerHTML = data.saldoActual;
 				
-				listaBonificaciones.innerHTML = data.bonificaciones && data.bonificaciones.length > 0 ? 
-					crearListaDesdeJson(data.bonificaciones) : '<div class="sin-datos">No hay bonificaciones asignadas</div>';
-				
-				listaVehiculos.innerHTML = data.vehiculos && data.vehiculos.length > 0 ? 
-					crearListaDesdeJson(data.vehiculos) : '<div class="sin-datos">No hay vehículos registrados</div>';
-				
-				listaTransitos.innerHTML = data.transitos && data.transitos.length > 0 ? 
-					crearListaDesdeJson(data.transitos) : '<div class="sin-datos">No hay tránsitos realizados</div>';
-				
-				listaNotificaciones.innerHTML = data.notificaciones && data.notificaciones.length > 0 ? 
-					crearListaDesdeJson(data.notificaciones) : '<div class="sin-datos">No hay notificaciones para borrar</div>';
+				// Mostrar todas las listas como tablas HTML
+				if (data.bonificaciones && data.bonificaciones.length > 0) {
+					mostrar_bonificacionesAsignadas(data.bonificaciones);
+				} else {
+					listaBonificaciones.innerHTML = '<div class="sin-datos">No hay bonificaciones asignadas</div>';
+				}
+
+				if (data.vehiculos && data.vehiculos.length > 0) {
+					listaVehiculos.innerHTML = crearTablaDesdeJson(data.vehiculos);
+				} else {
+					listaVehiculos.innerHTML = '<div class="sin-datos">No hay vehículos registrados</div>';
+				}
+
+				if (data.transitos && data.transitos.length > 0) {
+					listaTransitos.innerHTML = crearTablaDesdeJson(data.transitos);
+				} else {
+					listaTransitos.innerHTML = '<div class="sin-datos">No hay tránsitos realizados</div>';
+				}
+
+				if (data.notificaciones && data.notificaciones.length > 0) {
+					listaNotificaciones.innerHTML = crearTablaDesdeJson(data.notificaciones);
+				} else {
+					listaNotificaciones.innerHTML = '<div class="sin-datos">No hay notificaciones para borrar</div>';
+				}
 			}
 
 			function logout() {
-				submit(urlCierreVista);
+				// Primero avisar al controlador de la vista para quitar observadores 
+				fetch('/propietario/vistaCerrada', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: '' })
+					.catch(() => {});
+
+				submit('/auth/logout');
+			}
+
+			// Esta función es llamada desde vistaWeb.js después de que finaliza el primer submit
+			function primerSubmitFinalizado() {
+				// Si llegamos acá, la inicialización de la vista (urlIniciarVista) fue exitosa
+				const cont = document.querySelector('.container');
+				if (cont) cont.style.display = 'block';
+			}
+
+			function mostrar_bonificacionesAsignadas(bonificaciones) {
+				// Renderiza una tabla con bonificación, puesto y fecha (igual que en admin/bonificaciones.html)
+				const cont = document.getElementById('listaBonificaciones');
+				cont.innerHTML = '';
+				const table = document.createElement('table');
+				const thead = document.createElement('thead');
+				thead.innerHTML = `
+					<tr>
+						<th>Bonificación</th>
+						<th>Puesto</th>
+						<th>Fecha asignación</th>
+					</tr>
+				`;
+				table.appendChild(thead);
+				const tbody = document.createElement('tbody');
+				if (bonificaciones && bonificaciones.length > 0) {
+					bonificaciones.forEach(b => {
+						const tr = document.createElement('tr');
+						const fecha = b.fechaAsignada ? new Date(b.fechaAsignada).toLocaleDateString() : '';
+						tr.innerHTML = `
+							<td>${b.nombreBonificacion || ''}</td>
+							<td>${b.nombrePuesto || ''}</td>
+							<td>${fecha}</td>
+						`;
+						tbody.appendChild(tr);
+					});
+				} else {
+					const tr = document.createElement('tr');
+					tr.innerHTML = '<td colspan="3">Sin bonificaciones asignadas</td>';
+					tbody.appendChild(tr);
+				}
+				table.appendChild(tbody);
+				cont.appendChild(table);
 			}
 
 			function procesarErrorSubmit(status, text) {

@@ -15,6 +15,7 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 
 public class Propietario extends Usuario {
+    public enum Eventos { cambioBonificaciones }
     private double saldoActual;
     private double saldoMinimoAlerta;
     private Estado estado;
@@ -81,7 +82,11 @@ public class Propietario extends Usuario {
 
     // mapear 
     for (Asignacion a : this.bonificacionesAsignadas) {
-        dto.bonificaciones.add(new AsignacionDto(a.getFechaAsignada().getTime()));
+        dto.bonificaciones.add(new AsignacionDto(
+            a.getFechaAsignada().getTime(),
+            a.getBonificacion().getNombre(),
+            a.getPuesto().getNombre()
+        ));
     }
     for (Vehiculo v : this.vehiculos) {
         String categoriaNombre = v.getCategoria() != null ? v.getCategoria().getNombreCategoria().toString() : null;
@@ -121,6 +126,8 @@ public class Propietario extends Usuario {
         // Crear y asignar la nueva bonificación
         Asignacion nuevaAsignacion = new Asignacion(bonificacion, puesto);
         this.bonificacionesAsignadas.add(nuevaAsignacion);
+        // Avisar a los observadores que cambió la lista de bonificaciones
+        avisar(Eventos.cambioBonificaciones);
     }
 
 
