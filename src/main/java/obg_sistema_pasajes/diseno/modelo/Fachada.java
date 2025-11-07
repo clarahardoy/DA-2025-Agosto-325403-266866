@@ -96,15 +96,23 @@ public class Fachada {
     }
 
     //-----------------BONIFICACIONES-----------------
-    public void inicializarBonificaciones() {
-        SBonificacion.inicializarBonificaciones();
-    }
 
     public List<Bonificacion> listarBonificaciones() {
         return SBonificacion.listarBonificaciones();
     }
 
-    public void asignarBonificacion(String cedula, String nombreBonificacion, String nombrePuesto) throws PeajeException {
-        SBonificacion.asignarBonificacion(cedula, nombreBonificacion, nombrePuesto);
+    public Bonificacion obtenerBonificacionPorNombre(String nombre) {
+        return SBonificacion.buscarBonificacionPorNombre(nombre);
     }
+
+    public void asignarBonificacion(Propietario propietario, String nombreBonificacion, Puesto puesto) throws PeajeException {
+        SBonificacion.asignarBonificacion(propietario, nombreBonificacion, puesto);
+    }
+
+    // Nuevo: permitir que la fachada agregue una bonificación al sistema
+    public void agregarBonificacion(String  nombre) {
+        SBonificacion.agregarBonificacion(nombre);
+    }
+
+
 }

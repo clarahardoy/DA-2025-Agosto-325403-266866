@@ -39,9 +39,14 @@ public class ControladorLogin {
 
     @PostMapping("/logout")
     public List<Respuesta> logout(HttpSession sesionHttp) throws PeajeException {
-        Sesion sesion = (Sesion) sesionHttp.getAttribute("usuarioAdmin");
-        if (sesion != null) {
-            Fachada.getInstancia().logout(sesion);
+        Sesion sesionProp = (Sesion) sesionHttp.getAttribute("usuarioPropietario");
+        if (sesionProp != null) {
+            Fachada.getInstancia().logout(sesionProp);
+            sesionHttp.removeAttribute("usuarioPropietario");
+            return Respuesta.lista(new Respuesta("paginaLogin", "/login/propietario.html"));
+        }
+        Object admin = sesionHttp.getAttribute("usuarioAdmin");
+        if (admin != null) {
             sesionHttp.removeAttribute("usuarioAdmin");
         }
         return Respuesta.lista(new Respuesta("paginaLogin", "/login/administrador.html"));

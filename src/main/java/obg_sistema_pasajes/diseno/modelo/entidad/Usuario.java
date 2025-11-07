@@ -1,6 +1,8 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 
-public abstract class Usuario {
+import observador.Observable;
+
+public abstract class Usuario extends Observable {
     private String nombreCompleto;
     private String password;
     private String cedula;
