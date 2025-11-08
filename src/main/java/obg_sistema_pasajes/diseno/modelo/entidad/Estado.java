@@ -20,4 +20,9 @@ public class Estado {
     public void setNombre(NombreEstado nombreEstado) {
         this.nombreEstado = nombreEstado;
     }
+
+    @Override
+    public String toString() {
+        return nombreEstado.name();
+    }
 }

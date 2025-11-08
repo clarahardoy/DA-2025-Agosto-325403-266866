@@ -6,7 +6,6 @@ import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo.NombreCategoria;
-import obg_sistema_pasajes.diseno.exception.PeajeException;
 
 public class SistemaVehiculo {
     private List<Vehiculo> vehiculos = new ArrayList<>();
@@ -31,17 +30,13 @@ public class SistemaVehiculo {
         vehiculos.add(v);
     }
 
-    public Vehiculo obtenerVehiculoPorMatricula(String matricula) throws PeajeException {
-        if (matricula == null) return null;
+    public Vehiculo obtenerVehiculoPorMatricula(String matricula) {
         Vehiculo vehiculo = null;
         for (Vehiculo v : vehiculos) {
             if (v.getMatricula() != null && v.getMatricula().equalsIgnoreCase(matricula)) {
                 vehiculo = v;
                 break;
             }
-        }
-        if (vehiculo == null) {
-            throw new PeajeException("No existe el vehículo");
         }
         return vehiculo;
     }
