@@ -26,17 +26,18 @@ public class SistemaAcceso {
     }
 
     public Sesion loginPropietario(String cedula, String pwd) throws PeajeException {
-        Sesion sesion = null;
         Propietario usuario = (Propietario) login(cedula, pwd, propietarios);
+        
+        if (usuario != null && usuario.estaDeshabilitado()) { 
+            throw new PeajeException("Usuario deshabilitado, no puede ingresar al sistema");
+        }
+        
         if (usuario != null) {
-            sesion = new Sesion(usuario);
+            Sesion sesion = new Sesion(usuario);
             sesiones.add(sesion);
             return sesion;
         }
-        // TODO: cambiar cuando implementemos el estado
-        if (usuario.getEstado().equals("Deshabilitado")) { 
-            throw new PeajeException("Usuario deshabilitado, no puede ingresar al sistema");
-        }
+        
         return null;
     }
 

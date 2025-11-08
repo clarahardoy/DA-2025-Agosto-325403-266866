@@ -16,25 +16,33 @@ import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 public class ControladorLogin {
 
     @PostMapping("/login-propietario")
-    public List<Respuesta> loginPropietario(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) throws PeajeException {
-        Sesion sesion = Fachada.getInstancia().loginPropietario(cedula, password);
-       // si hay una sesion activa la cierro
-       logout(sesionHttp);
+    public List<Respuesta> loginPropietario(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) {
+        try {
+            Sesion sesion = Fachada.getInstancia().loginPropietario(cedula, password);
+            // si hay una sesion activa la cierro
+            logout(sesionHttp);
 
-       // guardo la sesion de la logica en la sesionHttp
-       sesionHttp.setAttribute("usuarioPropietario", sesion);
-       return Respuesta.lista(new Respuesta("loginExitoso", "/propietario/tablero.html"));
+            // guardo la sesion de la logica en la sesionHttp
+            sesionHttp.setAttribute("usuarioPropietario", sesion);
+            return Respuesta.lista(new Respuesta("loginExitoso", "/propietario/tablero.html"));
+        } catch (PeajeException e) {
+            return Respuesta.lista(new Respuesta("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/login-admin")
-    public List<Respuesta> loginAdministrador(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) throws PeajeException {
-        if(sesionHttp.getAttribute("usuarioAdmin") != null){
-         return Respuesta.lista(new Respuesta("yaLogueado", "/admin/menu.html"));
+    public List<Respuesta> loginAdministrador(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) {
+        try {
+            if(sesionHttp.getAttribute("usuarioAdmin") != null){
+                return Respuesta.lista(new Respuesta("yaLogueado", "/admin/menu.html"));
+            }
+            Administrador admin = Fachada.getInstancia().loginAdministrador(cedula, password);
+            // guardo el admin en la sesionHttp
+            sesionHttp.setAttribute("usuarioAdmin", admin);
+            return Respuesta.lista(new Respuesta("loginExitoso", "/admin/menu.html"));
+        } catch (PeajeException e) {
+            return Respuesta.lista(new Respuesta("error", e.getMessage()));
         }
-        Administrador admin = Fachada.getInstancia().loginAdministrador(cedula, password);
-        // guardo el admin en la sesionHttp
-        sesionHttp.setAttribute("usuarioAdmin", admin);
-        return Respuesta.lista(new Respuesta("loginExitoso", "/admin/menu.html"));  
     }
 
     @PostMapping("/logout")
