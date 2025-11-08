@@ -80,6 +80,10 @@
 				window.location.href = urlDestino;
 			}
 
+			async function mostrar_error(mensaje) {
+				await mostrarMensaje(mensaje);
+			}
+
 			async function excepcionDeAplicacion(text) {
 				await mostrarMensaje(text);
 			}

@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.Fachada;
@@ -14,7 +13,6 @@ import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Asignacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Bonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
-import obg_sistema_pasajes.diseno.dto.BonificacionDto;
 
 @RestController
 @RequestMapping("/bonificaciones") 
