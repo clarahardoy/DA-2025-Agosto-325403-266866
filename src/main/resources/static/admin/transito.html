@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Administrador - Emular Transito</title>
+		<link rel="stylesheet" href="../app.css" />
+		<script src="../utilesVista.js"></script>
+		<script src="../vistaWeb.js"></script>
+		<link rel="stylesheet" href="transito.css" />
+		<style></style>
+	</head>
+	<body>
+		<div class="card">
+			<h2>Emular tránsito</h2>
+			<p class="subtitle">
+				Seleccione un puesto, verifique sus tarifas, ingrese una matrícula y
+				emule un tránsito.
+			</p>
+
+			<div class="main-grid">
+				<div>
+					<div class="form-group">
+						<label>Puesto</label>
+						<select id="puesto" onchange="cargarTarifasPuesto()">
+							<option value="">Seleccione un puesto</option>
+						</select>
+					</div>
+
+					<div class="form-group">
+						<label>Matrícula</label>
+						<input
+							type="text"
+							id="matricula"
+							placeholder="Ej: ABC1234"
+							maxlength="10"
+						/>
+					</div>
+
+					<div class="form-group">
+						<label>Fecha y hora del tránsito</label>
+						<input
+							type="text"
+							id="fechaHora"
+							placeholder="Ej: 2025-11-19 15:30"
+						/>
+					</div>
+
+					<button class="btn" onclick="emularTransito()">
+						Emular tránsito
+					</button>
+				</div>
+
+				<div>
+					<div class="tarifa-box">
+						<h3>Tarifas del puesto</h3>
+						<table class="tarifa-table">
+							<thead>
+								<tr>
+									<th>Categoría</th>
+									<th>Monto</th>
+								</tr>
+							</thead>
+							<tbody id="listaTarifas">
+								<tr>
+									<td colspan="2" style="text-align: center; color: #999">
+										Seleccione un puesto
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<p class="tarifa-note">
+							Se muestran categoría y monto actuales del puesto seleccionado.
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<div id="resultadoSection" class="resultado-section resultado-hidden">
+				<h3>Resultado</h3>
+				<div id="resultadoContenido"></div>
+			</div>
+
+			<div class="footer-note">© 2025 - Emular transitos</div>
+		</div>
+
+		<script>
+			urlIniciarVista = '/transito/vista-conectada';
+
+			// Almacena todos los puestos con sus tarifas
+			let puestosConTarifas = [];
+
+			function mostrar_puestos(puestos) {
+				puestosConTarifas = puestos;
+				const select = document.getElementById('puesto');
+				select.innerHTML = '<option value="">Seleccione un puesto</option>';
+				puestos.forEach((p, index) => {
+					const option = document.createElement('option');
+					option.value = index;
+					option.textContent = p.nombre;
+					select.appendChild(option);
+				});
+			}
+
+			function cargarTarifasPuesto() {
+				const selectPuesto = document.getElementById('puesto');
+				const index = selectPuesto.value;
+				const tbody = document.getElementById('listaTarifas');
+
+				if (index === '') {
+					tbody.innerHTML = `
+						<tr>
+							<td colspan="2" style="text-align: center; color: #999">
+								Seleccione un puesto
+							</td>
+						</tr>
+					`;
+					return;
+				}
+
+				const puesto = puestosConTarifas[index];
+				tbody.innerHTML = '';
+
+				if (puesto.tarifas && puesto.tarifas.length > 0) {
+					puesto.tarifas.forEach((t) => {
+						const tr = document.createElement('tr');
+						tr.innerHTML = `
+							<td>${t.categoria.nombre}</td>
+							<td>$ ${t.monto.toFixed(2)}</td>
+						`;
+						tbody.appendChild(tr);
+					});
+				} else {
+					tbody.innerHTML = `
+						<tr>
+							<td colspan="2" style="text-align: center; color: #999">
+								Sin tarifas definidas
+							</td>
+						</tr>
+					`;
+				}
+			}
+
+			async function emularTransito() {
+				const puesto = document.getElementById('puesto').value;
+				const matricula = document.getElementById('matricula').value;
+				const fechaHora = document.getElementById('fechaHora').value;
+
+				if (!puesto) {
+					await mostrarMensaje('Debe seleccionar un puesto');
+					return;
+				}
+
+				if (!matricula || matricula.trim() === '') {
+					await mostrarMensaje('Debe ingresar una matrícula');
+					return;
+				}
+
+				if (!fechaHora || fechaHora.trim() === '') {
+					await mostrarMensaje('Debe ingresar una fecha y hora');
+					return;
+				}
+
+				const puestoSeleccionado = puestosConTarifas[puesto];
+				submit(
+					'/transito/emular',
+					`puestoNombre=${encodeURIComponent(
+						puestoSeleccionado.nombre
+					)}&matricula=${encodeURIComponent(
+						matricula
+					)}&fechaHora=${encodeURIComponent(fechaHora)}`
+				);
+			}
+
+			function mostrar_resultadoTransito(resultado) {
+				const section = document.getElementById('resultadoSection');
+				const contenido = document.getElementById('resultadoContenido');
+
+				let html = `
+					<div class="info-item">
+						<strong>Propietario:</strong> ${resultado.propietario}
+					</div>
+					<div class="info-item">
+						<strong>Categoría:</strong> ${resultado.categoria}
+					</div>
+					<div class="info-item">
+						<strong>Bonificación:</strong> ${resultado.bonificacion}
+					</div>
+					<div class="info-item">
+						<strong>Costo del tránsito:</strong> $ ${resultado.costoTransito.toFixed(2)}
+					</div>
+					<div class="info-item">
+						<strong>Saldo luego del tránsito:</strong> $ ${resultado.saldoFinal.toFixed(2)}
+					</div>
+				`;
+
+				contenido.innerHTML = html;
+				section.classList.remove('resultado-hidden');
+			}
+
+			async function mostrar_error(mensaje) {
+				await mostrarMensaje(mensaje);
+			}
+
+			async function excepcionDeAplicacion(text) {
+				console.log('entro a excepcionDeAplicacion');
+				await mostrarMensaje(text);
+			}
+		</script>
+	</body>
+</html>
