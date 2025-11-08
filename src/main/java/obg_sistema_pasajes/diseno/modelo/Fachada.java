@@ -6,17 +6,19 @@ import obg_sistema_pasajes.diseno.modelo.sistema.SistemaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.sistema.SistemaBonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Tarifa;
+import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
 import obg_sistema_pasajes.diseno.modelo.entidad.Bonificacion;
-
+import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
-
+// Fachada extends Observable
 public class Fachada {
 
     private SistemaAcceso sAcceso = new SistemaAcceso();
@@ -70,11 +72,11 @@ public class Fachada {
         SPuesto.agregarPuesto(nombre, direccion);
     }
 
-    public java.util.List<Puesto> listarPuestos() {
+    public List<Puesto> listarPuestos() {
         return SPuesto.listarPuestos();
     }
 
-    public java.util.List<Tarifa> obtenerTarifasPuesto(String nombrePuesto) {
+    public List<Tarifa> obtenerTarifasPuesto(String nombrePuesto) {
         return SPuesto.obtenerTarifasPuesto(nombrePuesto);
     }
     
@@ -82,6 +84,9 @@ public class Fachada {
         return SPuesto.obtenerPuestoPorNombre(nombrePuesto);
     }
 
+    public void agregarTarifaAPuesto(String nombrePuesto, double monto, CategoriaVehiculo nombreCategoria) {
+        SPuesto.agregarTarifaAPuesto(nombrePuesto, monto, nombreCategoria);
+    }
 
 
     //-----------------VEHICULOS-----------------
@@ -90,9 +95,20 @@ public class Fachada {
         if (p != null) SVehiculo.agregarVehiculoAPropietario(p, matricula, modelo, color, categoria);
     }
 
+    public Vehiculo obtenerVehiculoPorMatricula(String matricula) throws PeajeException {
+        return SVehiculo.obtenerVehiculoPorMatricula(matricula);
+    }
     //-----------------PROPIETARIOS-----------------
     public Propietario obtenerPropietarioPorCedula(String cedula) {
         return sAcceso.obtenerPropietarioPorCedula(cedula);
+    }
+
+    public Transito registrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException {
+        Propietario propietario = vehiculo.getPropietario();
+        if (propietario == null) {
+            throw new PeajeException("El vehículo no tiene propietario asignado");
+        }
+        return propietario.registrarTransito(vehiculo, puesto, fechaHora);
     }
 
     //-----------------BONIFICACIONES-----------------

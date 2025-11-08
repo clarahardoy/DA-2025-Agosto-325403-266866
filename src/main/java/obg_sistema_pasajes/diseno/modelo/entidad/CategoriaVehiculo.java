@@ -1,17 +1,28 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 
 public class CategoriaVehiculo {
-    private String nombre;
+    public enum NombreCategoria {
+        AUTO,
+        CAMIONETA,
+        CAMION
+    }    
+    private NombreCategoria nombreCategoria;
 
-    public CategoriaVehiculo(String nombre) {
-        this.nombre = nombre;
+    public CategoriaVehiculo(NombreCategoria nombreCategoria) {
+        this.nombreCategoria = nombreCategoria;
     }
     
-    public String getNombre() {
-        return nombre;
+    public NombreCategoria getNombreCategoria() {
+        return nombreCategoria;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+
+    public void setNombre(NombreCategoria nombreCategoria) {
+        this.nombreCategoria = nombreCategoria;
+    }
+
+    @Override
+    public String toString() {
+        return nombreCategoria.name();
     }
 }

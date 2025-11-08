@@ -1,17 +1,23 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 
 public class Estado {
-    private String nombre;
+    public enum NombreEstado {
+        DESHABILITADO,
+        SUSPENDIDO,
+        PENALIZADO,
+        HABILITADO;
+    }
+    private NombreEstado nombreEstado;
 
-    public Estado(String nombre) {
-        this.nombre = nombre;
+    public Estado(NombreEstado nombreEstado) {
+        this.nombreEstado = nombreEstado;
     }
     
-    public String getNombre() {
-        return nombre;
+    public NombreEstado getNombre() {
+        return nombreEstado;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setNombre(NombreEstado nombreEstado) {
+        this.nombreEstado = nombreEstado;
     }
 }
