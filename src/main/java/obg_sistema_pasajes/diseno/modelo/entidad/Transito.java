@@ -1,5 +1,4 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
-
 import java.util.Date;
 
 
@@ -9,32 +8,24 @@ public class Transito {
     private Puesto puesto;
     private Propietario propietario;
     private Tarifa tarifa;
-    private Bonificacion bonificacionAplicada;
+    private Bonificacion bonificacion;
+    private boolean bonificacionAplicada;
     private double montoBonificado;
     private double montoPagado;
 
 
     public Transito(Vehiculo vehiculo, Puesto puesto, Propietario propietario, 
-                   Tarifa tarifa, double montoFinal, Date fechaTransito) {
+                   Tarifa tarifa, double montoFinal, Bonificacion bonificacion, boolean bonificacionAplicada, Date fechaHora, double montoBonificado) {
         this.vehiculo = vehiculo;
         this.puesto = puesto;
         this.propietario = propietario;
         this.tarifa = tarifa;
         this.montoPagado = montoFinal;
-        this.fechaHora = fechaTransito;
-
-            if (!propietario.getEstado().getNombre().equals("Penalizado")) { //Capaz hacer funcion en propietario para ver si esta penalizado?
-            this.bonificacionAplicada = propietario.getBonificacionParaPuesto(puesto);
-            if (this.bonificacionAplicada != null) {
-                this.montoBonificado = tarifa.getMonto() - montoFinal;
-            }
-        }
-        
-        // Actualizar saldo del propietario
-        propietario.descontarSaldo(montoFinal);
+        this.montoBonificado = montoBonificado;
+        this.bonificacion = bonificacion;
+        this.bonificacionAplicada = bonificacionAplicada;
+        this.fechaHora = fechaHora; 
     }
-
-
 
     public Date getFechaHora() {
         return fechaHora;
@@ -86,12 +77,22 @@ public class Transito {
     }
 
 
-    public Bonificacion getBonificacionAplicada() {
+    public Bonificacion getBonificacion() {
+        return bonificacion;
+    }
+
+
+    public void setBonificacion(Bonificacion bonificacion) {
+        this.bonificacion = bonificacion;
+    }
+
+
+    public boolean isBonificacionAplicada() {
         return bonificacionAplicada;
     }
 
 
-    public void setBonificacionAplicada(Bonificacion bonificacionAplicada) {
+    public void setBonificacionAplicada(boolean bonificacionAplicada) {
         this.bonificacionAplicada = bonificacionAplicada;
     }
 
@@ -115,5 +116,13 @@ public class Transito {
         this.montoPagado = montoPagado;
     }
 
-            // Aplicar bonificación si no está penalizado
+    public double getMontoBase() {
+        return tarifa.getMonto();
+    }
+    
+    public CategoriaVehiculo getCategoria() {
+        return tarifa.getCategoria();
+    }
+
+            
 }

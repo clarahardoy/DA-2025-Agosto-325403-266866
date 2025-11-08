@@ -3,6 +3,8 @@ package obg_sistema_pasajes.diseno.modelo.entidad;
 import java.util.ArrayList;
 import java.util.List;
 
+import obg_sistema_pasajes.diseno.exception.PeajeException;
+
 public class Puesto {
     private String nombre;
     private String direccion;
@@ -35,5 +37,14 @@ public class Puesto {
 
     public void agregarTarifa(Tarifa t) {
         tarifas.add(t);
+    }
+
+    public Tarifa obtenerTarifaPorCategoria(CategoriaVehiculo categoria) throws PeajeException {
+        for (Tarifa t : tarifas) {
+            if (t.getCategoria().getNombreCategoria() == categoria.getNombreCategoria()) {
+                return t;
+            }
+        }
+        throw new PeajeException("No existe tarifa para la categoría: " + categoria.getNombreCategoria().toString());
     }
 }
