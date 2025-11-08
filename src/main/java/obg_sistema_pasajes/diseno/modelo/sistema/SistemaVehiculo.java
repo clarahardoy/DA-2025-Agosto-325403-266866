@@ -5,6 +5,8 @@ import java.util.List;
 import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
+import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo.NombreCategoria;
+import obg_sistema_pasajes.diseno.exception.PeajeException;
 
 public class SistemaVehiculo {
     private List<Vehiculo> vehiculos = new ArrayList<>();
@@ -13,7 +15,7 @@ public class SistemaVehiculo {
     // va ? ---------------------------------------------------
     private List<CategoriaVehiculo> categorias = new ArrayList<>();
 
-    public void agregarCategoria(String nombre) {
+    public void agregarCategoria(NombreCategoria nombre) {
         categorias.add(new CategoriaVehiculo(nombre));
     }
 
@@ -29,12 +31,19 @@ public class SistemaVehiculo {
         vehiculos.add(v);
     }
 
-    public Vehiculo buscarVehiculoPorMatricula(String matricula) {
+    public Vehiculo obtenerVehiculoPorMatricula(String matricula) throws PeajeException {
         if (matricula == null) return null;
+        Vehiculo vehiculo = null;
         for (Vehiculo v : vehiculos) {
-            if (v.getMatricula() != null && v.getMatricula().equalsIgnoreCase(matricula)) return v;
+            if (v.getMatricula() != null && v.getMatricula().equalsIgnoreCase(matricula)) {
+                vehiculo = v;
+                break;
+            }
         }
-        return null;
+        if (vehiculo == null) {
+            throw new PeajeException("No existe el vehículo");
+        }
+        return vehiculo;
     }
 
     public List<Vehiculo> listarVehiculos() {
