@@ -11,15 +11,18 @@ import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
-import obg_sistema_pasajes.diseno.modelo.entidad.Bonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
+import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
+import java.util.Arrays;
+import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado.TipoEstado;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
-// Fachada extends Observable
-public class Fachada {
+import observador.Observable;
+
+public class Fachada extends Observable {
 
     private SistemaAcceso sAcceso = new SistemaAcceso();
     private SistemaPuestos SPuesto = new SistemaPuestos();
@@ -35,11 +38,7 @@ public class Fachada {
         return instancia;
     }
 
-
-    private Fachada() {
-    }
-
- 
+    private Fachada() { }
 
     //DELEGACIONES
     public void agregarPropietario(String nombreCompleto, String password, String cedula, double saldoActual, double saldoMinimoAlerta) {
@@ -128,6 +127,10 @@ public class Fachada {
     // Nuevo: permitir que la fachada agregue una bonificación al sistema
     public void agregarBonificacion(String  nombre) {
         SBonificacion.agregarBonificacion(nombre);
+    }
+
+    public ArrayList<TipoEstado> getTiposEstado() {
+        return new ArrayList<TipoEstado>(Arrays.asList(TipoEstado.values()));
     }
 
 

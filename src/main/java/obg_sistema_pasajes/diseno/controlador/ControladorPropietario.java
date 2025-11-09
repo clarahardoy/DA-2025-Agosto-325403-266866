@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.annotation.Scope;
 
 import jakarta.servlet.http.HttpSession;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/propietario")
+@Scope("session")
 public class ControladorPropietario implements Observador{
 
     private Propietario propietario;
@@ -65,7 +67,9 @@ public class ControladorPropietario implements Observador{
 
     @Override
     public void actualizar(Object evento, Observable origen) {
-        if(evento!=null && evento.equals(Propietario.Eventos.cambioBonificaciones)){
+        if(evento!=null && (evento.equals(Propietario.Eventos.CAMBIO_BONIFICACIONES) || 
+                            evento.equals(Propietario.Eventos.CAMBIO_NOTIFICACIONES) ||
+                            evento.equals(Propietario.Eventos.CAMBIO_ESTADO))){
             Propietario p = (Propietario) origen;
             conexionNavegador.enviarJSON(Respuesta.lista(new Respuesta("tableroData", p.obtenerTableroDto())));
         }
@@ -75,13 +79,12 @@ public class ControladorPropietario implements Observador{
     public List<Respuesta> borrarNotificaciones(HttpSession sesionHttp) throws PeajeException{
         Sesion sesion = (Sesion) sesionHttp.getAttribute("usuarioPropietario");
         if(sesion == null) throw new PeajeException("Usuario no autenticado");
-
         
         Propietario p = (Propietario) sesion.getUsuario();
         if(p.getNotificaciones() == null || p.getNotificaciones().isEmpty()){
-            return Respuesta.lista(new Respuesta("borrarResultado", "No hay notificaciones para borrar"));
+            throw new PeajeException("No hay notificaciones para borrar");
         }
         p.borrarNotificaciones();
-        return Respuesta.lista(new Respuesta("borrarResultado", "OK"));
+        return Respuesta.lista(new Respuesta("mensaje", "Notificaciones borradas correctamente"));
     }
 }
