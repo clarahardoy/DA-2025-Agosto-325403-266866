@@ -125,9 +125,9 @@
 					puesto.tarifas.forEach((t) => {
 						const tr = document.createElement('tr');
 						tr.innerHTML = `
-							<td>${t.categoria.nombre}</td>
-							<td>$ ${t.monto.toFixed(2)}</td>
-						`;
+						<td>${t.categoria.nombreCategoria}</td>
+						<td>$ ${t.monto.toFixed(2)}</td>
+					`;
 						tbody.appendChild(tr);
 					});
 				} else {

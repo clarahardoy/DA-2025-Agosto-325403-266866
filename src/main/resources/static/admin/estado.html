@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Cambiar Estado de Propietario</title>
+		<link rel="stylesheet" href="../app.css" />
+		<script src="../utilesVista.js"></script>
+		<script src="../vistaWeb.js"></script>
+		<link rel="stylesheet" href="estado.css" />
+	</head>
+	<body>
+		<div class="card">
+			<h2>Cambiar estado de propietario</h2>
+
+			<div class="main-grid">
+				<!-- Columna izquierda -->
+				<div>
+					<div class="search-container">
+						<input
+							type="text"
+							id="cedula"
+							placeholder="Cédula de identidad"
+							onkeypress="if(event.key === 'Enter') buscarPropietario()"
+						/>
+						<button class="btn" onclick="buscarPropietario()">
+							Buscar propietario
+						</button>
+					</div>
+
+					<div id="infoPropietario" style="display: none">
+						<div class="info-box">
+							<div class="section-title">Propietario</div>
+							<div class="info-row">
+								<span class="info-label">Nombre:</span>
+								<span id="nombrePropietario" class="info-value"></span>
+							</div>
+							<div class="info-row">
+								<span class="info-label">Estado actual:</span>
+								<span id="estadoPropietario" class="info-value"></span>
+							</div>
+						</div>
+
+						<form id="formEstados" onsubmit="cambiarEstado(event)">
+							<div class="form-group">
+								<label>Estados disponibles</label>
+								<span id="spnEstados"></span>
+							</div>
+							<button class="btn btn-primary" type="submit">
+								Cambiar estado
+							</button>
+						</form>
+					</div>
+				</div>
+
+				<!-- Columna derecha -->
+				<div>
+					<div class="info-note">
+						<h3>Instrucciones</h3>
+						<ul>
+							<li>Ingrese la cédula de identidad del propietario</li>
+							<li>Haga clic en "Buscar propietario"</li>
+							<li>Se mostrará el nombre y estado actual del propietario</li>
+							<li>Seleccione un nuevo estado de la lista</li>
+							<li>Haga clic en "Cambiar estado" para aplicar el cambio</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="footer-note">© 2025 - Administración</div>
+		</div>
+
+		<script>
+			urlIniciarVista = '/estados/vista-conectada';
+			urlCierreVista = '/estados/vista-desconectada';
+
+			async function buscarPropietario() {
+				const cedula = document.getElementById('cedula').value.trim();
+				if (!cedula) {
+					await mostrarMensaje('Debe ingresar una cédula');
+					return;
+				}
+				submit(
+					'/estados/buscar-propietario',
+					`cedula=${encodeURIComponent(cedula)}`
+				);
+			}
+
+			function mostrar_propietarioNombre(nombre) {
+				document.getElementById('nombrePropietario').textContent = nombre;
+				document.getElementById('infoPropietario').style.display = 'block';
+			}
+
+			function mostrar_estadoActual(estado) {
+				document.getElementById('estadoPropietario').textContent = estado;
+				seleccionarPorTexto('posEstado', estado);
+			}
+
+			function mostrar_estados(estados) {
+				document.getElementById('spnEstados').innerHTML = crearListaDesdeJson({
+					data: estados,
+					id: 'posEstado',
+					campoMostrar: 'nombre',
+					mostrarOpcionInicial: false,
+				});
+			}
+
+			function cambiarEstado(event) {
+				event.preventDefault();
+				submit('/estados/cambiar-estado', serializarFormulario('formEstados'));
+			}
+
+			function mostrar_mensaje(mensaje) {
+				excepcionDeAplicacion(mensaje);
+			}
+
+			async function excepcionDeAplicacion(mensaje) {
+				await mostrarMensaje(mensaje);
+			}
+		</script>
+	</body>
+</html>
