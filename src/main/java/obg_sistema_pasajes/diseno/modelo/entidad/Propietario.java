@@ -310,13 +310,13 @@ public class Propietario extends Usuario {
     private void registrarNotificacionTransito(Puesto puesto, Vehiculo vehiculo) {
         String mensaje = "Pasaste por el puesto " + puesto.getNombre() + 
                         " con el vehículo " + vehiculo.getMatricula();
-        notificaciones.add(new Notificacion(mensaje));
+        agregarNotificacion(mensaje);
     }
 
     private void registrarNotificacionSaldoBajo() {
         String mensaje = "Tu saldo actual es de $ " + saldoActual + 
                         " Te recomendamos hacer una recarga";
-        notificaciones.add(new Notificacion(mensaje));
+        agregarNotificacion(mensaje);
     }
 
     public void borrarNotificaciones() {
