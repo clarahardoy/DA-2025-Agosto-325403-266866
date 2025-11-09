@@ -1,6 +1,8 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 import java.util.Date;
 
+import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
+
 
 public class Transito {
     private Date fechaHora;

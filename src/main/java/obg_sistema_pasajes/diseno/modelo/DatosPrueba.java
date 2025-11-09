@@ -24,19 +24,19 @@ public class DatosPrueba {
 
     // precarga tarifas
         // Puesto 204 - Ruta Interbalnearia
-    fachada.agregarTarifaAPuesto("Puesto 204 - Ruta Interbalnearia", 500, new CategoriaVehiculo(NombreCategoria.AUTO));
-    fachada.agregarTarifaAPuesto("Puesto 204 - Ruta Interbalnearia", 500, new CategoriaVehiculo(NombreCategoria.CAMIONETA));
-    fachada.agregarTarifaAPuesto("Puesto 204 - Ruta Interbalnearia", 500, new CategoriaVehiculo(NombreCategoria.CAMION));
+    fachada.agregarTarifaAPuesto("Puesto 204 - Ruta Interbalnearia", 100, new CategoriaVehiculo(NombreCategoria.AUTO));
+    fachada.agregarTarifaAPuesto("Puesto 204 - Ruta Interbalnearia", 110, new CategoriaVehiculo(NombreCategoria.CAMIONETA));
+    fachada.agregarTarifaAPuesto("Puesto 204 - Ruta Interbalnearia", 120, new CategoriaVehiculo(NombreCategoria.CAMION));
     
     // Puesto 156 - Ruta 1
-    fachada.agregarTarifaAPuesto("Puesto 156 - Ruta 1", 1000, new CategoriaVehiculo(NombreCategoria.AUTO));
-    fachada.agregarTarifaAPuesto("Puesto 156 - Ruta 1", 1000, new CategoriaVehiculo(NombreCategoria.CAMIONETA));
-    fachada.agregarTarifaAPuesto("Puesto 156 - Ruta 1", 1000, new CategoriaVehiculo(NombreCategoria.CAMION));
+    fachada.agregarTarifaAPuesto("Puesto 156 - Ruta 1", 110, new CategoriaVehiculo(NombreCategoria.AUTO));
+    fachada.agregarTarifaAPuesto("Puesto 156 - Ruta 1", 120, new CategoriaVehiculo(NombreCategoria.CAMIONETA));
+    fachada.agregarTarifaAPuesto("Puesto 156 - Ruta 1", 130, new CategoriaVehiculo(NombreCategoria.CAMION));
     
     // Puesto 73 - Ruta 5
-    fachada.agregarTarifaAPuesto("Puesto 73 - Ruta 5", 1500, new CategoriaVehiculo(NombreCategoria.AUTO));
+    fachada.agregarTarifaAPuesto("Puesto 73 - Ruta 5", 100, new CategoriaVehiculo(NombreCategoria.AUTO));
     fachada.agregarTarifaAPuesto("Puesto 73 - Ruta 5", 150, new CategoriaVehiculo(NombreCategoria.CAMIONETA));
-    fachada.agregarTarifaAPuesto("Puesto 73 - Ruta 5", 150, new CategoriaVehiculo(NombreCategoria.CAMION));
+    fachada.agregarTarifaAPuesto("Puesto 73 - Ruta 5", 200, new CategoriaVehiculo(NombreCategoria.CAMION));
 
     // precarga vehículos
     fachada.agregarVehiculoAPropietario("52252441", "ABC1234", "Toyota Corolla", "Blanco", new CategoriaVehiculo(NombreCategoria.AUTO));

@@ -9,13 +9,16 @@ import obg_sistema_pasajes.diseno.dto.NotificacionDto;
 import obg_sistema_pasajes.diseno.dto.TableroPropietarioDto;
 import obg_sistema_pasajes.diseno.dto.TransitoDto;
 import obg_sistema_pasajes.diseno.dto.VehiculoDto;
-import obg_sistema_pasajes.diseno.modelo.entidad.Estado.NombreEstado;
+import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
+import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado;
+import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado.TipoEstado;
+import obg_sistema_pasajes.diseno.modelo.entidad.estado.EstadoHabilitado;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
 public class Propietario extends Usuario {
-    public enum Eventos { cambioBonificaciones }
+    public enum Eventos { CAMBIO_BONIFICACIONES, CAMBIO_ESTADO, CAMBIO_NOTIFICACIONES }
     private double saldoActual;
     private double saldoMinimoAlerta;
     private Estado estado;
@@ -31,7 +34,7 @@ public class Propietario extends Usuario {
         super(nombreCompleto, password, cedula);
         this.saldoActual = saldoActual;
         this.saldoMinimoAlerta = saldoMinimoAlerta;
-        this.estado = new Estado(NombreEstado.DESHABILITADO); // estado por defecto
+        this.estado = new EstadoHabilitado(this); // estado por defecto
     }
 
     public double getSaldoActual() {
@@ -102,15 +105,9 @@ public class Propietario extends Usuario {
     return dto;
     }
 
-    public void borrarNotificaciones() {
-    this.notificaciones.clear();
-    }
-
      public void descontarSaldo(double monto) {
         this.saldoActual -= monto;
     }
-
-    //-------------------------------
 
     public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
         // Validar que el propietario esté habilitado
@@ -127,25 +124,55 @@ public class Propietario extends Usuario {
         Asignacion nuevaAsignacion = new Asignacion(bonificacion, puesto);
         this.bonificacionesAsignadas.add(nuevaAsignacion);
         // Avisar a los observadores que cambió la lista de bonificaciones
-        avisar(Eventos.cambioBonificaciones);
+        avisar(Eventos.CAMBIO_BONIFICACIONES);
     }
 
 
+    public boolean puedeLoguearse() throws PeajeException {
+        return estado.puedeLoguearse();
+    }
+
+    // ESTADOS
+
     public boolean estaDeshabilitado() { 
-        return estado.getNombre().equals(NombreEstado.DESHABILITADO); 
+        return estado.getNombre().equals(TipoEstado.DESHABILITADO); 
+    }
+
+    public void deshabilitar() throws PeajeException {
+        estado.deshabilitar();
     }
 
     public boolean estaSuspendido() {
-        return estado.getNombre().equals(NombreEstado.SUSPENDIDO);
+        return estado.getNombre().equals(TipoEstado.SUSPENDIDO);
+    }
+
+    public void suspender() throws PeajeException {
+        estado.suspender();
     }
 
     public boolean estaPenalizado() {
-        return estado.getNombre().equals(NombreEstado.PENALIZADO);
+        return estado.getNombre().equals(TipoEstado.PENALIZADO);
+    }
+
+    public void penalizar() throws PeajeException {
+        estado.penalizar();
     }
 
     public boolean estaHabilitado() {
-        return estado.getNombre().equals(NombreEstado.HABILITADO);
+        return estado.getNombre().equals(TipoEstado.HABILITADO);
     }
+
+    public void habilitar() throws PeajeException {
+        estado.habilitar();
+    }
+
+    public void cambiarEstado(Estado estado) throws PeajeException {
+        this.estado = estado;
+        hacerRegistrarNotificacion();
+        avisar(Eventos.CAMBIO_ESTADO);
+    }
+
+    // TRANSITOS 
 
     public boolean tieneSaldoSuficiente(double monto) {
         return this.saldoActual >= monto;
@@ -157,19 +184,6 @@ public class Propietario extends Usuario {
         }
         if (estaSuspendido()) {
             throw new PeajeException("El propietario del vehículo está suspendido, no puede realizar tránsitos");
-        }
-    }
-
-    public void agregarNotificacion(String mensaje) {
-        this.notificaciones.add(new Notificacion(mensaje));
-    }
-
-    public void verificarYNotificarSaldoBajo() {
-        if (this.saldoActual < this.saldoMinimoAlerta) {
-            String mensaje = new Date().toString() + 
-                " Tu saldo actual es de $ " + this.saldoActual + 
-                " Te recomendamos hacer una recarga";
-            agregarNotificacion(mensaje);
         }
     }
 
@@ -211,8 +225,6 @@ public class Propietario extends Usuario {
         return null;
     }
 
-    // mantener validar del padre (si se desea extender, sobreescribir)
-
     public Transito registrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException {
         if (!this.vehiculos.contains(vehiculo)) {
             throw new PeajeException("El vehículo no pertenece a este propietario");
@@ -227,7 +239,7 @@ public class Propietario extends Usuario {
         Bonificacion bonificacion = getBonificacionParaPuesto(puesto);
         boolean bonificacionFueAplicada = false;
 
-        if (estado.getNombre() != NombreEstado.PENALIZADO && bonificacion != null) {
+        if (estado.getNombre() != TipoEstado.PENALIZADO && bonificacion != null) {
             montoFinal = bonificacion.calcularMontoConDescuento(
                 montoBaseTarifa, vehiculo, this.transitos);
             bonificacionFueAplicada = (montoFinal != montoBaseTarifa);
@@ -253,7 +265,7 @@ public class Propietario extends Usuario {
         this.transitos.add(transito);
         
         //notificaciones
-        if (this.estado.getNombre() != NombreEstado.PENALIZADO) {
+        if (this.estado.getNombre() != TipoEstado.PENALIZADO) {
             registrarNotificacionTransito(puesto, vehiculo);
             
             if (saldoActual < saldoMinimoAlerta) {
@@ -264,16 +276,52 @@ public class Propietario extends Usuario {
         return transito;
     }
     
+    protected void hacerRegistrarTransito() {
+        this.estado.registrarTransito();
+    }
+
+    protected void hacerAsignarBonificacion() {
+        this.estado.asignarBonificacion();
+    }
+
+    protected void hacerAplicarDescuento() {
+        this.estado.aplicarDescuento();
+    }
+
+    protected void hacerRegistrarNotificacion() {
+        this.estado.registrarNotificacion();
+    }
+    // NOTIFICACIONES 
+
+    public void agregarNotificacion(String mensaje) {
+        this.notificaciones.add(new Notificacion(mensaje));
+        avisar(Eventos.CAMBIO_NOTIFICACIONES);
+    }
+
+    public void verificarYNotificarSaldoBajo() {
+        if (this.saldoActual < this.saldoMinimoAlerta) {
+            String mensaje = new Date().toString() + 
+                " Tu saldo actual es de $ " + this.saldoActual + 
+                " Te recomendamos hacer una recarga";
+            agregarNotificacion(mensaje);
+        }
+    }
+
     private void registrarNotificacionTransito(Puesto puesto, Vehiculo vehiculo) {
         String mensaje = "Pasaste por el puesto " + puesto.getNombre() + 
                         " con el vehículo " + vehiculo.getMatricula();
-        notificaciones.add(new Notificacion(mensaje));
+        agregarNotificacion(mensaje);
     }
 
     private void registrarNotificacionSaldoBajo() {
         String mensaje = "Tu saldo actual es de $ " + saldoActual + 
                         " Te recomendamos hacer una recarga";
-        notificaciones.add(new Notificacion(mensaje));
+        agregarNotificacion(mensaje);
+    }
+
+    public void borrarNotificaciones() {
+        this.notificaciones.clear();
+        avisar(Eventos.CAMBIO_NOTIFICACIONES);
     }
 }
 

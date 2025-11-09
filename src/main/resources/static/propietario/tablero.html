@@ -12,7 +12,7 @@
 	<body>
 		<script src="../utilesVista.js"></script>
 
-		<div class="container" style="display:none">
+		<div class="container" style="display: none">
 			<div class="header">
 				<h1>Tablero de control del propietario</h1>
 				<button class="btn-salir" onclick="logout()">Salir</button>
@@ -67,7 +67,11 @@
 			<div class="notificaciones-section">
 				<div class="notificaciones-header">
 					<h3>Notificaciones del sistema</h3>
-					<button class="btn-borrar" onclick="borrarNotificaciones()">
+					<button
+						class="btn-borrar"
+						type="button"
+						onclick="borrarNotificaciones(event)"
+					>
 						Borrar notificaciones
 					</button>
 				</div>
@@ -105,37 +109,46 @@
 				spnNombreCompleto.innerHTML = data.nombreCompleto.toUpperCase();
 				spnEstadoPropietario.innerHTML = data.estado.toUpperCase();
 				spnSaldoActual.innerHTML = data.saldoActual;
-				
+
 				// Mostrar todas las listas como tablas HTML
 				if (data.bonificaciones && data.bonificaciones.length > 0) {
 					mostrar_bonificacionesAsignadas(data.bonificaciones);
 				} else {
-					listaBonificaciones.innerHTML = '<div class="sin-datos">No hay bonificaciones asignadas</div>';
+					listaBonificaciones.innerHTML =
+						'<div class="sin-datos">No hay bonificaciones asignadas</div>';
 				}
 
 				if (data.vehiculos && data.vehiculos.length > 0) {
 					listaVehiculos.innerHTML = crearTablaDesdeJson(data.vehiculos);
 				} else {
-					listaVehiculos.innerHTML = '<div class="sin-datos">No hay vehículos registrados</div>';
+					listaVehiculos.innerHTML =
+						'<div class="sin-datos">No hay vehículos registrados</div>';
 				}
 
 				if (data.transitos && data.transitos.length > 0) {
 					listaTransitos.innerHTML = crearTablaDesdeJson(data.transitos);
 				} else {
-					listaTransitos.innerHTML = '<div class="sin-datos">No hay tránsitos realizados</div>';
+					listaTransitos.innerHTML =
+						'<div class="sin-datos">No hay tránsitos realizados</div>';
 				}
 
 				if (data.notificaciones && data.notificaciones.length > 0) {
-					listaNotificaciones.innerHTML = crearTablaDesdeJson(data.notificaciones);
+					listaNotificaciones.innerHTML = crearTablaDesdeJson(
+						data.notificaciones
+					);
 				} else {
-					listaNotificaciones.innerHTML = '<div class="sin-datos">No hay notificaciones para borrar</div>';
+					listaNotificaciones.innerHTML =
+						'<div class="sin-datos">No hay notificaciones para borrar</div>';
 				}
 			}
 
 			function logout() {
-				// Primero avisar al controlador de la vista para quitar observadores 
-				fetch('/propietario/vistaCerrada', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: '' })
-					.catch(() => {});
+				// Primero avisar al controlador de la vista para quitar observadores
+				fetch('/propietario/vistaCerrada', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+					body: '',
+				}).catch(() => {});
 
 				submit('/auth/logout');
 			}
@@ -163,9 +176,11 @@
 				table.appendChild(thead);
 				const tbody = document.createElement('tbody');
 				if (bonificaciones && bonificaciones.length > 0) {
-					bonificaciones.forEach(b => {
+					bonificaciones.forEach((b) => {
 						const tr = document.createElement('tr');
-						const fecha = b.fechaAsignada ? new Date(b.fechaAsignada).toLocaleDateString() : '';
+						const fecha = b.fechaAsignada
+							? new Date(b.fechaAsignada).toLocaleDateString()
+							: '';
 						tr.innerHTML = `
 							<td>${b.nombreBonificacion || ''}</td>
 							<td>${b.nombrePuesto || ''}</td>
@@ -186,6 +201,19 @@
 				if (status == 400) {
 					window.location.href = '/login/propietario.html';
 				}
+			}
+
+			function borrarNotificaciones(event) {
+				event.preventDefault();
+				submit('/propietario/borrar-notificaciones');
+			}
+
+			async function mostrar_mensaje(mensaje) {
+				await mostrarMensaje(mensaje);
+			}
+
+			async function excepcionDeAplicacion(mensaje) {
+				await mostrarMensaje(mensaje);
 			}
 
 			function mostrar_paginaLogin(url) {
