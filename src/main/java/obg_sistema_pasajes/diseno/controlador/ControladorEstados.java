@@ -54,8 +54,8 @@ public class ControladorEstados implements Observador {
         
         return Respuesta.lista(
             new Respuesta("propietarioNombre", propietario.getNombreCompleto()),
-            new Respuesta("estadoActual", propietario.getEstado().getNombre().toString()),
-            estados()
+            estados(),
+            new Respuesta("estadoActual", propietario.getEstado().getNombre().toString())
         );
     }
 

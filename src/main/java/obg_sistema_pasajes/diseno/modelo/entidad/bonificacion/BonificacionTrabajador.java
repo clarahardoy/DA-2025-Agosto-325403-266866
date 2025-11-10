@@ -1,11 +1,11 @@
 package obg_sistema_pasajes.diseno.modelo.entidad.bonificacion;
 
 import java.util.List;
+import java.util.Date;
+import java.util.Calendar;
 
 import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
 import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
-
-import java.time.LocalDateTime;
 
 public class BonificacionTrabajador extends Bonificacion {
     
@@ -14,11 +14,15 @@ public class BonificacionTrabajador extends Bonificacion {
     }
 
     @Override
-    public boolean puedeAplicarBonificacion(Vehiculo vehiculo, List<Transito> transitosHoy) {
-        //Aplica solo en días de semana (Lunes a Viernes)
-        LocalDateTime ahora = LocalDateTime.now();
-        int diaSemana = ahora.getDayOfWeek().getValue(); // 1=Lunes, 7=Domingo
-        return diaSemana >= 1 && diaSemana <= 5;
+    public boolean puedeAplicarBonificacion(Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha) {
+        // Aplica solo en días de semana (Lunes a Viernes) 
+        if (fecha == null) {
+            return false;
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(fecha);
+        int diaSemana = cal.get(Calendar.DAY_OF_WEEK); 
+        return diaSemana >= Calendar.MONDAY && diaSemana <= Calendar.FRIDAY;
     }
 
     @Override

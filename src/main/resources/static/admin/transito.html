@@ -86,8 +86,8 @@
 
 		<script>
 			urlIniciarVista = '/transito/vista-conectada';
+			urlCierreVista = '/transito/vistaCerrada';
 
-			// Almacena todos los puestos con sus tarifas
 			let puestosConTarifas = [];
 
 			function mostrar_puestos(puestos) {
@@ -203,7 +203,6 @@
 			}
 
 			async function excepcionDeAplicacion(text) {
-				console.log('entro a excepcionDeAplicacion');
 				await mostrarMensaje(text);
 			}
 		</script>

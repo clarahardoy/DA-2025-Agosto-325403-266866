@@ -85,7 +85,6 @@
 		<script src="../utilesVista.js"></script>
 		<script>
 			urlIniciarVista = '/propietario/vistaConectada';
-			// El endpoint en el controlador es /propietario/vistaCerrada (metodo salir()), usar esa ruta para cerrar la vista
 			urlCierreVista = '/propietario/vistaCerrada';
 			urlRegistroSSE = '/propietario/registrarSSE';
 
@@ -155,6 +154,11 @@
 
 			// Esta función es llamada desde vistaWeb.js después de que finaliza el primer submit
 			function primerSubmitFinalizado() {
+				try {
+					if (typeof registrarSSE === 'function') registrarSSE();
+				} catch (e) {
+					console.warn('No se pudo registrar SSE:', e);
+				}
 				// Si llegamos acá, la inicialización de la vista (urlIniciarVista) fue exitosa
 				const cont = document.querySelector('.container');
 				if (cont) cont.style.display = 'block';

@@ -1,6 +1,7 @@
 package obg_sistema_pasajes.diseno.modelo.entidad.bonificacion;
 
 import java.util.List;
+import java.util.Date;
 
 import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
 import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
@@ -12,7 +13,7 @@ public class BonificacionFrecuente extends Bonificacion {
     }
 
     @Override
-    public boolean puedeAplicarBonificacion(Vehiculo vehiculo, List<Transito> transitosHoy) {
+    public boolean puedeAplicarBonificacion(Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha) {
         // Aplica desde el 2do tránsito del día
         return transitosHoy != null && transitosHoy.size() >= 1;
     }

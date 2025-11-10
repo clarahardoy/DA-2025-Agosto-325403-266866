@@ -2,11 +2,14 @@ package obg_sistema_pasajes.diseno.controlador;
 
 import java.util.List;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.text.SimpleDateFormat;
 import obg_sistema_pasajes.diseno.modelo.Fachada;
@@ -15,13 +18,34 @@ import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
 import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
 import obg_sistema_pasajes.diseno.dto.TransitoDto;
+import obg_sistema_pasajes.diseno.ConexionNavegador;
+import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
+import observador.Observador;
+import observador.Observable;
 
 @RestController
 @RequestMapping("/transito")
-public class ControladorTransito {
+@Scope("session")
+public class ControladorTransito implements Observador {
+
+    private Administrador administradorSesion;
+    private final ConexionNavegador conexionNavegador;
+
+    public ControladorTransito(@Autowired ConexionNavegador conexionNavegador) {
+        this.conexionNavegador = conexionNavegador;
+    }
+
 
     @PostMapping("/vista-conectada")
-    public List<Respuesta> inicializarVista() {
+    public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin") Administrador admin) {
+        if (administradorSesion != null) administradorSesion.quitarObservador(this);
+        administradorSesion = admin;
+        administradorSesion.agregarObservador(this);
+
+        return buildInicialData();
+    }
+
+    private List<Respuesta> buildInicialData() {
         return Respuesta.lista(
             new Respuesta("vistaConectada", "Vista conectada correctamente"),
             new Respuesta("puestos", Fachada.getInstancia().listarPuestos())
@@ -72,9 +96,19 @@ public class ControladorTransito {
             transito.getPropietario().getEstado().getNombre().toString(),
             transito.getCategoria().getNombreCategoria().toString(),
             transito.getBonificacion() != null ? 
-                transito.getBonificacion().getNombre() : "Ninguna",
+            transito.getBonificacion().getNombre() : "Ninguna",
             transito.getMontoPagado(),
             transito.getPropietario().getSaldoActual()
         );
+    }
+
+    @PostMapping("/vistaCerrada")
+    public void salir(){
+        if(administradorSesion!=null) administradorSesion.quitarObservador(this);
+    }
+
+    @Override
+    public void actualizar(Object evento, Observable origen) {
+        conexionNavegador.enviarJSON(buildInicialData());
     }
 }
