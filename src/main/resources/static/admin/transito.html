@@ -4,9 +4,9 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Administrador - Emular Transito</title>
-		<link rel="stylesheet" href="../app.css" />
-		<script src="../utilesVista.js"></script>
-		<script src="../vistaWeb.js"></script>
+		<link rel="stylesheet" href="/app.css" />
+		<script src="/utilesVista.js"></script>
+		<script src="/vistaWeb.js"></script>
 		<link rel="stylesheet" href="transito.css" />
 		<style></style>
 	</head>
@@ -205,6 +205,14 @@
 			async function excepcionDeAplicacion(text) {
 				await mostrarMensaje(text);
 			}
+
+
+
+			// Maneja la respuesta inicial del servidor indicando que la vista está conectada  (error consola)-----------------------------
+			function mostrar_vistaConectada(mensaje) {
+				console.log('vistaConectada:', mensaje);
+			}
+
 		</script>
 	</body>
 </html>

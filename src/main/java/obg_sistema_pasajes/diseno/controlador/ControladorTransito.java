@@ -37,7 +37,7 @@ public class ControladorTransito implements Observador {
 
 
     @PostMapping("/vista-conectada")
-    public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin") Administrador admin) {
+    public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin") Administrador admin) throws PeajeException{
         if (administradorSesion != null) administradorSesion.quitarObservador(this);
         administradorSesion = admin;
         administradorSesion.agregarObservador(this);

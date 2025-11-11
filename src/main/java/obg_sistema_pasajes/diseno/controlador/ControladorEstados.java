@@ -59,7 +59,7 @@ public class ControladorEstados implements Observador {
         );
     }
 
-    @PostMapping("/vista-desconectada")
+    @PostMapping("/vistaCerrada")
     public void salir(){
         if(propietario!=null) propietario.quitarObservador(this);
     }

@@ -37,7 +37,11 @@ public class ControladorBonificaciones implements Observador {
     }
 
     @PostMapping("/vistaConectada")
-    public List<Respuesta> obtenerDatos(@SessionAttribute(name = "usuarioAdmin") Administrador admin) {
+    public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin", required = false) Administrador admin) throws PeajeException {
+        if (admin == null) {
+            return Respuesta.lista(new Respuesta("paginaLogin", "/login/administrador.html"));
+        }
+        
         if (administradorSesion != null) administradorSesion.quitarObservador(this);
         administradorSesion = admin;
         administradorSesion.agregarObservador(this);
