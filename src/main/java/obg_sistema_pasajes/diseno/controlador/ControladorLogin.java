@@ -24,7 +24,6 @@ public class ControladorLogin {
             // si hay una sesion activa la cierro (esto cierra el SSE también)
             logout(sesionHttp, conexionNavegador);
 
-            // guardo la sesion de la logica en la sesionHttp
             sesionHttp.setAttribute("usuarioPropietario", sesion);
             return Respuesta.lista(new Respuesta("loginExitoso", "/propietario/tablero.html"));
         } catch (PeajeException e) {
@@ -39,13 +38,12 @@ public class ControladorLogin {
                 return Respuesta.lista(new Respuesta("yaLogueado", "/admin/menu.html"));
             }
             
-            // Si hay un propietario logueado, cerrar su sesión y SSE
+            // Si hay un propietario logueado, cerrar sesión y SSE
             if(sesionHttp.getAttribute("usuarioPropietario") != null){
                 logout(sesionHttp, conexionNavegador);
             }
             
             Administrador admin = Fachada.getInstancia().loginAdministrador(cedula, password);
-            // guardo el admin en la sesionHttp
             sesionHttp.setAttribute("usuarioAdmin", admin);
             return Respuesta.lista(new Respuesta("loginExitoso", "/admin/menu.html"));
         } catch (PeajeException e) {

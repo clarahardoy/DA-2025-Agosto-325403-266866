@@ -30,6 +30,7 @@ import observador.Observador;
 public class ControladorBonificaciones implements Observador {
 
     private Administrador administradorSesion;
+    private Propietario propietarioActual;
     private final ConexionNavegador conexionNavegador;
 
     public ControladorBonificaciones(@Autowired ConexionNavegador conexionNavegador){
@@ -41,10 +42,14 @@ public class ControladorBonificaciones implements Observador {
         if (admin == null) {
             return Respuesta.lista(new Respuesta("paginaLogin", "/login/administrador.html"));
         }
-        
+
         if (administradorSesion != null) administradorSesion.quitarObservador(this);
         administradorSesion = admin;
         administradorSesion.agregarObservador(this);
+
+        // Quitar observador del propietario anterior si existe
+        if (propietarioActual != null) propietarioActual.quitarObservador(this);
+        propietarioActual = null;
 
         return buildInicialData();
     }
@@ -75,12 +80,21 @@ public class ControladorBonificaciones implements Observador {
         if (propietario == null) {
             throw new PeajeException("No existe el propietario");
         }
-        
+
+        // Quitar observador del propietario anterior si existe
+        if (propietarioActual != null && !propietarioActual.equals(propietario)) {
+            propietarioActual.quitarObservador(this);
+        }
+
+        // Registrar como observador del nuevo propietario
+        propietarioActual = propietario;
+        propietarioActual.agregarObservador(this);
+
         List<String> bonificacionesAsignadas = new ArrayList<>();
         for (Asignacion asignacion : propietario.getBonificacionesAsignadas()) {
             bonificacionesAsignadas.add(asignacion.getBonificacion().getNombre() + " - " + asignacion.getPuesto().getNombre());
         }
-        
+
         return Respuesta.lista(
             new Respuesta("propietarioNombre", propietario.getNombreCompleto()),
             new Respuesta("propietarioEstado", propietario.getEstado().getNombre()),
@@ -102,14 +116,16 @@ public class ControladorBonificaciones implements Observador {
             throw new PeajeException("Debe especificar un puesto");
         }
         
-        Propietario propietario = Fachada.getInstancia().obtenerPropietarioPorCedula(cedula);
-        if (propietario == null) throw new PeajeException("No existe el propietario");
+        // IMPORTANTE: Usar propietarioActual en lugar de buscar de nuevo
+        if (propietarioActual == null || !propietarioActual.getCedula().equals(cedula)) {
+            throw new PeajeException("Debe buscar al propietario primero");
+        }
 
         Puesto puestoObj = Fachada.getInstancia().obtenerPuestoPorNombre(puesto);
         if (puestoObj == null) throw new PeajeException("Debe especificar un puesto");
 
-        // Delegar la asignación pasando objetos resueltos
-        Fachada.getInstancia().asignarBonificacion(propietario, bonificacion, puestoObj);
+        // Delegar la asignación usando propietarioActual (el que está siendo observado)
+        Fachada.getInstancia().asignarBonificacion(propietarioActual, bonificacion, puestoObj);
         
         return Respuesta.lista(
             new Respuesta("asignacionExitosa", "La bonificación fue asignada correctamente")
@@ -119,12 +135,32 @@ public class ControladorBonificaciones implements Observador {
     @PostMapping("/vistaCerrada")
     public void salir(){
         if(administradorSesion!=null) administradorSesion.quitarObservador(this);
+        if(propietarioActual!=null) propietarioActual.quitarObservador(this);
     }
 
     @Override
     public void actualizar(Object evento, Observable origen) {
-        // En cualquier evento que llegue, reenviamos el estado inicial actualizado al navegador
-        conexionNavegador.enviarJSON(buildInicialData());
+        
+        if (origen instanceof Administrador) {
+            conexionNavegador.enviarJSON(buildInicialData());
+        } else if (origen instanceof Propietario && propietarioActual != null && origen.equals(propietarioActual)) {
+            if (evento.equals(Propietario.Eventos.CAMBIO_BONIFICACIONES)) {
+                conexionNavegador.enviarJSON(buildBonificacionesAsignadas());
+            }
+        } 
+    }
+
+    private List<Respuesta> buildBonificacionesAsignadas() {
+        if (propietarioActual == null) return new ArrayList<>();
+
+        List<String> bonificacionesAsignadas = new ArrayList<>();
+        for (Asignacion asignacion : propietarioActual.getBonificacionesAsignadas()) {
+            bonificacionesAsignadas.add(asignacion.getBonificacion().getNombre() + " - " + asignacion.getPuesto().getNombre());
+        }
+
+        return Respuesta.lista(
+            new Respuesta("bonificacionesAsignadas", bonificacionesAsignadas)
+        );
     }
 
     

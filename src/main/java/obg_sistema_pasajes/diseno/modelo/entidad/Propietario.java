@@ -115,19 +115,21 @@ public class Propietario extends Usuario {
         return b.getFechaHora().compareTo(a.getFechaHora());
     });
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    SimpleDateFormat sdfFecha = new SimpleDateFormat("yyyy-MM-dd");
+    SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm:ss");
     for (Transito t : this.transitos) {
-        String puestoNombre = t.getPuesto() != null ? t.getPuesto().getNombre() : null;
-        String matricula = t.getVehiculo() != null ? t.getVehiculo().getMatricula() : null;
-        String categoriaNombre = t.getCategoria() != null ? t.getCategoria().getNombreCategoria().toString() : null;
-        String nombreBonificacion = t.getBonificacion() != null ? t.getBonificacion().getNombre() : null;
+        String puestoNombre = t.getPuesto() != null ? t.getPuesto().getNombre() : "-";
+        String matricula = t.getVehiculo() != null ? t.getVehiculo().getMatricula() : "-";
+        String categoriaNombre = t.getCategoria() != null ? t.getCategoria().getNombreCategoria().toString() : "-";
+        String nombreBonificacion = t.getBonificacion() != null ? t.getBonificacion().getNombre() : "Ninguna";
         double montoTarifa = t.getTarifa() != null ? t.getTarifa().getMonto() : 0.0;
         double montoBonificado = t.getMontoBonificado();
         double montoPagado = t.getMontoPagado();
-        String fecha = t.getFechaHora() != null ? sdf.format(t.getFechaHora()) : null;
+        String fecha = t.getFechaHora() != null ? sdfFecha.format(t.getFechaHora()) : "-";
+        String hora = t.getFechaHora() != null ? sdfHora.format(t.getFechaHora()) : "-";
 
         dto.transitos.add(new TransitoDto(puestoNombre, matricula, categoriaNombre,
-                nombreBonificacion, montoTarifa, montoBonificado, montoPagado, fecha));
+                nombreBonificacion, montoTarifa, montoBonificado, montoPagado, fecha, hora));
     }
     // ordenar notificaciones por fechaHora descendente 
     this.notificaciones.sort((a, b) -> {

@@ -168,13 +168,12 @@
 
     async function mostrar_asignacionExitosa(mensaje) {
       await mostrarMensaje(mensaje);
-      buscarPropietario(); // Recargar los datos del propietario
     }
 
     async function excepcionDeAplicacion(text) {
       console.log("entro a excepcionDeAplicacion");
-				await mostrarMensaje(text);
-			}
+      await mostrarMensaje(text);
+    }
   </script>
 </body>
 </html>
