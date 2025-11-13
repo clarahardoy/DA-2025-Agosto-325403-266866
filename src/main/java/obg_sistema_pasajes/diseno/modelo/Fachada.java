@@ -17,8 +17,7 @@ import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Arrays;
-import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado.TipoEstado;
+import obg_sistema_pasajes.diseno.modelo.entidad.estado.TipoEstado;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import observador.Observable;
 
@@ -129,8 +128,16 @@ public class Fachada extends Observable {
         SBonificacion.agregarBonificacion(nombre);
     }
 
-    public ArrayList<TipoEstado> getTiposEstado() {
-        return new ArrayList<TipoEstado>(Arrays.asList(TipoEstado.values()));
+    public List<TipoEstado> getTiposEstado() {
+        return sAcceso.listarTiposEstado();
+    }
+
+    public void agregarTipoEstado(String nombre) {
+        sAcceso.agregarTipoEstado(nombre);
+    }
+
+    public TipoEstado buscarTipoEstadoPorNombre(String nombre) {
+        return sAcceso.buscarTipoEstadoPorNombre(nombre);
     }
 
 

@@ -9,6 +9,12 @@ public class DatosPrueba {
 
     Fachada fachada = Fachada.getInstancia();
 
+    // precarga tipos de estado
+    fachada.agregarTipoEstado("DESHABILITADO");
+    fachada.agregarTipoEstado("SUSPENDIDO");
+    fachada.agregarTipoEstado("PENALIZADO");
+    fachada.agregarTipoEstado("HABILITADO");
+
     // precarga propietarios
     fachada.agregarPropietario("Usuario Propietario", "prop.123", "23456789", 2000, 500);
     fachada.agregarPropietario("Clara Hardoy", "test123", "52252441", 1000, 500);

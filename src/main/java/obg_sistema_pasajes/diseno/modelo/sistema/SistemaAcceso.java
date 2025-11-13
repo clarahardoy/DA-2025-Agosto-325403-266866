@@ -6,6 +6,7 @@ import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import obg_sistema_pasajes.diseno.modelo.entidad.Usuario;
+import obg_sistema_pasajes.diseno.modelo.entidad.estado.TipoEstado;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 
 public class SistemaAcceso {
@@ -13,6 +14,7 @@ public class SistemaAcceso {
     private List<Propietario> propietarios = new ArrayList<>();
     private List<Administrador> administradores = new ArrayList<>();
     private ArrayList<Sesion> sesiones = new ArrayList<>();
+    private List<TipoEstado> tiposEstado = new ArrayList<>();
 
     public void agregarPropietario(String nombreCompleto, String password, String cedula,
             double saldoActual, double saldoMinimoAlerta) {
@@ -69,6 +71,23 @@ public class SistemaAcceso {
         for (Propietario p : propietarios) {
             if (p.getCedula() != null && p.getCedula().equals(cedula)) {
                 return p;
+            }
+        }
+        return null;
+    }
+
+    public void agregarTipoEstado(String nombre) {
+        tiposEstado.add(new TipoEstado(nombre));
+    }
+    
+    public List<TipoEstado> listarTiposEstado() {
+        return new ArrayList<>(tiposEstado);
+    }
+    
+    public TipoEstado buscarTipoEstadoPorNombre(String nombre) {
+        for (TipoEstado tipo : tiposEstado) {
+            if (tipo.getNombre().equals(nombre)) {
+                return tipo;
             }
         }
         return null;

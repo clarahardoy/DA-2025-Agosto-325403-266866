@@ -4,22 +4,16 @@ import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 
 public abstract class Estado {
-    public enum TipoEstado {
-        DESHABILITADO,
-        SUSPENDIDO,
-        PENALIZADO,
-        HABILITADO
-    }
-    private TipoEstado nombreEstado;
+    private String nombre;
     private Propietario propietario;
 
-    public Estado(TipoEstado nombreEstado, Propietario propietario) {
-        this.nombreEstado = nombreEstado;
+    public Estado(Propietario propietario, String nombre) {
+        this.nombre = nombre;
         this.propietario = propietario;
     }
     
-    public TipoEstado getNombre() {
-        return nombreEstado;
+    public String getNombre() {
+        return nombre;
     }
 
     public Propietario getPropietario() {
@@ -47,10 +41,15 @@ public abstract class Estado {
 
     }
 
-    public abstract void registrarNotificacion();
+    public void registrarNotificacion() {
+        java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String fechaHora = formatter.format(new java.util.Date());
+        String mensaje = "[" + fechaHora + "] Se ha cambiado tu estado en el sistema. Tu estado actual es " + getNombre();
+        getPropietario().agregarNotificacion(mensaje);
+    }
 
     @Override
     public String toString() {
-        return nombreEstado.name();
+        return nombre;
     }
 }

@@ -1,6 +1,8 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 import java.util.Date;
+import java.util.List;
 
+import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 
 
@@ -16,17 +18,33 @@ public class Transito {
     private double montoPagado;
 
 
-    public Transito(Vehiculo vehiculo, Puesto puesto, Propietario propietario, 
-                   Tarifa tarifa, double montoFinal, Bonificacion bonificacion, boolean bonificacionAplicada, Date fechaHora, double montoBonificado) {
+
+    public Transito(Vehiculo vehiculo, Puesto puesto, Propietario propietario, Date fechaHora) throws PeajeException {
+        this(vehiculo, puesto, propietario, fechaHora, propietario.getBonificacionParaPuesto(puesto));
+    }
+
+    public Transito(Vehiculo vehiculo, Puesto puesto, Propietario propietario, Date fechaHora, Bonificacion bonificacion) throws PeajeException {
         this.vehiculo = vehiculo;
         this.puesto = puesto;
         this.propietario = propietario;
-        this.tarifa = tarifa;
-        this.montoPagado = montoFinal;
-        this.montoBonificado = montoBonificado;
+        this.fechaHora = fechaHora;
+
+        // Obtener tarifa según categoría del vehículo
+        this.tarifa = puesto.obtenerTarifaPorCategoria(vehiculo.getCategoria());
+        double montoBase = tarifa.getMonto();
+
+        this.montoPagado = montoBase;
+        this.montoBonificado = 0.0;
+        this.bonificacionAplicada = false;
+
+        // Aplicar bonificación si corresponde
         this.bonificacion = bonificacion;
-        this.bonificacionAplicada = bonificacionAplicada;
-        this.fechaHora = fechaHora; 
+        if (this.bonificacion != null && !propietario.estaPenalizado()) {
+            List<Transito> transitosDelDia = vehiculo.getTransitosDelDia(puesto, fechaHora);
+            this.montoPagado = this.bonificacion.aplicarBonificacion(montoBase, vehiculo, transitosDelDia, fechaHora);
+            this.bonificacionAplicada = (this.montoPagado != montoBase);
+            this.montoBonificado = montoBase - this.montoPagado;
+        }
     }
 
     public Date getFechaHora() {

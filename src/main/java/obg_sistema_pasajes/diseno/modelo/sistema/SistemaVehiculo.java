@@ -26,7 +26,7 @@ public class SistemaVehiculo {
     public void agregarVehiculoAPropietario(Propietario propietario, String matricula, String modelo, String color, CategoriaVehiculo categoria) {
         Vehiculo v = new Vehiculo(matricula, modelo, color, categoria);
         v.setPropietario(propietario);
-        propietario.getVehiculos().add(v);
+        propietario.agregarVehiculo(v);
         vehiculos.add(v);
     }
 

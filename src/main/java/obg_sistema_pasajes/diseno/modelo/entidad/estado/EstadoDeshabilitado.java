@@ -1,13 +1,11 @@
 package obg_sistema_pasajes.diseno.modelo.entidad.estado;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class EstadoDeshabilitado extends Estado {
     
     public EstadoDeshabilitado(Propietario propietario) {
-        super(TipoEstado.DESHABILITADO, propietario);
+        super(propietario, "DESHABILITADO");
     }
 
     @Override
@@ -34,13 +32,5 @@ public class EstadoDeshabilitado extends Estado {
     @Override
     public boolean puedeLoguearse() throws PeajeException {
         return false;
-    }
-
-    @Override
-    public void registrarNotificacion() {
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        String fechaHora = formatter.format(new Date());
-        String mensaje = "[" + fechaHora + "] Se ha cambiado tu estado en el sistema. Tu estado actual es " + getNombre().toString();
-        getPropietario().agregarNotificacion(mensaje);
     }
 }

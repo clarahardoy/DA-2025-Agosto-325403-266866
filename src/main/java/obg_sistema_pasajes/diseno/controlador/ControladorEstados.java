@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Scope;
 import observador.Observador;
 import obg_sistema_pasajes.diseno.ConexionNavegador;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
-import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado.TipoEstado;
+import obg_sistema_pasajes.diseno.modelo.entidad.estado.TipoEstado;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +25,7 @@ import obg_sistema_pasajes.diseno.dto.NombreDto;
 
 public class ControladorEstados implements Observador {
 
-    private ArrayList<TipoEstado> estados;
+    private List<String> estados;
     private final ConexionNavegador conexionNavegador; 
     private Propietario propietario;
 
@@ -55,7 +55,7 @@ public class ControladorEstados implements Observador {
         return Respuesta.lista(
             new Respuesta("propietarioNombre", propietario.getNombreCompleto()),
             estados(),
-            new Respuesta("estadoActual", propietario.getEstado().getNombre().toString())
+            new Respuesta("estadoActual", propietario.getEstado().getNombre())
         );
     }
 
@@ -82,15 +82,18 @@ public class ControladorEstados implements Observador {
     }
 
     private Respuesta estadoActual() {
-        return new Respuesta("estadoActual", propietario.getEstado().getNombre().toString());
+        return new Respuesta("estadoActual", propietario.getEstado().getNombre());
       }
    
 
     private Respuesta estados(){
-        estados = new ArrayList<TipoEstado>(Fachada.getInstancia().getTiposEstado());
+        List<TipoEstado> tiposEstado = Fachada.getInstancia().getTiposEstado();
+        estados = new ArrayList<String>();
         List<NombreDto> dtos = new ArrayList<NombreDto>();
-        for (TipoEstado tipoEstado:estados){
-            dtos.add(new NombreDto(tipoEstado.toString()));
+        for (TipoEstado tipoEstado : tiposEstado){
+            String nombre = tipoEstado.getNombre();
+            estados.add(nombre);
+            dtos.add(new NombreDto(nombre));
         }  
         return new Respuesta("estados", dtos);
     }

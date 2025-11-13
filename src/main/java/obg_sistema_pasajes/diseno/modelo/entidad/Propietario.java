@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 
-import obg_sistema_pasajes.diseno.dto.AsignacionDto;
 import obg_sistema_pasajes.diseno.dto.NotificacionDto;
 import obg_sistema_pasajes.diseno.dto.TableroPropietarioDto;
 import obg_sistema_pasajes.diseno.dto.TransitoDto;
 import obg_sistema_pasajes.diseno.dto.VehiculoDto;
 import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado;
-import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado.TipoEstado;
 import obg_sistema_pasajes.diseno.modelo.entidad.estado.EstadoHabilitado;
 
 import java.util.Date;
@@ -65,6 +63,10 @@ public class Propietario extends Usuario {
         return vehiculos;
     }
 
+    public void agregarVehiculo(Vehiculo vehiculo) {
+        this.vehiculos.add(vehiculo);
+    }
+
     public List<Asignacion> getBonificacionesAsignadas() {
         return bonificacionesAsignadas;
     }
@@ -88,23 +90,12 @@ public class Propietario extends Usuario {
 
     // mapear 
     for (Asignacion a : this.bonificacionesAsignadas) {
-        dto.bonificaciones.add(new AsignacionDto(
-            a.getFechaAsignada().getTime(),
-            a.getBonificacion().getNombre(),
-            a.getPuesto().getNombre()
-        ));
+        dto.bonificaciones.add(a.toDto());
     }
     for (Vehiculo v : this.vehiculos) {
         String categoriaNombre = v.getCategoria() != null ? v.getCategoria().getNombreCategoria().toString() : null;
-        int contador = 0;
-        double gastado = 0.0;
-        for (Transito t : this.transitos) {
-            if (t != null && t.getVehiculo() != null && t.getVehiculo().getMatricula() != null
-                    && t.getVehiculo().getMatricula().equals(v.getMatricula())) {
-                contador++;
-                gastado += t.getMontoPagado();
-            }
-        }
+        int contador = v.getContadorTransitos();
+        double gastado = v.getTotalGastado();
         dto.vehiculos.add(new VehiculoDto(v.getMatricula(), v.getModelo(), v.getColor(), categoriaNombre, contador, gastado));
     }
     // ordenar transitos por fechaHora descendente 
@@ -208,34 +199,6 @@ public class Propietario extends Usuario {
         this.transitos.add(transito);
     }
 
-    public List<Transito> getTransitosDelDia(Vehiculo vehiculo, Puesto puesto, Date fecha) {
-        List<Transito> transitosDelDia = new ArrayList<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String fechaBuscada = sdf.format(fecha);
-
-        for (Transito t : transitos) {
-            if (t != null && t.getFechaHora() != null) {
-                String fechaTransito = sdf.format(t.getFechaHora());
-                if (fechaBuscada.equals(fechaTransito)) {
-                    boolean matchVehiculo = true;
-                    if (vehiculo != null) {
-                        matchVehiculo = (t.getVehiculo() != null  && t.getVehiculo().getMatricula().equals(vehiculo.getMatricula()));
-                    }
-                    boolean matchPuesto = true;
-                    if (puesto != null) {
-                        matchPuesto = (t.getPuesto() != null && t.getPuesto().equals(puesto));
-                    }
-
-                    if (matchVehiculo && matchPuesto) {
-                        transitosDelDia.add(t);
-                    }
-                }
-            }
-        }
-        return transitosDelDia;
-    }
-
-
     public Bonificacion getBonificacionParaPuesto(Puesto puesto) {
         for (Asignacion asignacion : bonificacionesAsignadas) {
             if (asignacion.getPuesto().equals(puesto)) {
@@ -252,41 +215,24 @@ public class Propietario extends Usuario {
  
         validarPuedeRealizarTransito();
 
-        Tarifa tarifa = puesto.obtenerTarifaPorCategoria(vehiculo.getCategoria());
-        double montoBaseTarifa = tarifa.getMonto();
-        
-        double montoFinal = montoBaseTarifa;
+        // Resolver bonificación asignada (el experto que elige es el Propietario)
         Bonificacion bonificacion = getBonificacionParaPuesto(puesto);
-        boolean bonificacionFueAplicada = false;
-
-        if (estado.getNombre() != TipoEstado.PENALIZADO && bonificacion != null) {
-            // obtener sólo los tránsitos del día para este vehículo y puesto
-            List<Transito> transitosMismoPuestoYVehiculo = getTransitosDelDia(vehiculo, puesto, fechaHora);
-            montoFinal = bonificacion.aplicarBonificacion(montoBaseTarifa, vehiculo, transitosMismoPuestoYVehiculo, fechaHora);
-            bonificacionFueAplicada = (montoFinal != montoBaseTarifa);
-        }
-
-        if (!tieneSaldoSuficiente(montoFinal)) {
+        // Crear el tránsito (el experto que aplica es Transito)
+        Transito transito = new Transito(vehiculo, puesto, this, fechaHora, bonificacion);
+        
+        // Verificar saldo y descontar
+        double montoPagado = transito.getMontoPagado();
+        if (!tieneSaldoSuficiente(montoPagado)) {
             throw new PeajeException("Saldo insuficiente: " + this.saldoActual);
         }
-        this.descontarSaldo(montoFinal);
-        double montoBonificado = montoBaseTarifa - montoFinal;
+        this.descontarSaldo(montoPagado);
         
-        Transito transito = new Transito(
-            vehiculo, 
-            puesto, 
-            this,           
-            tarifa,       
-            montoFinal,   
-            bonificacion, 
-            bonificacionFueAplicada, 
-            fechaHora,
-            montoBonificado
-        );
+        // Agregar a las listas
         this.transitos.add(transito);
+        vehiculo.agregarTransito(transito);
         
-        //notificaciones
-        if (this.estado.getNombre() != TipoEstado.PENALIZADO) {
+        // Notificaciones
+        if (!this.estado.getNombre().equals("PENALIZADO")) {
             registrarNotificacionTransito(puesto, vehiculo);
             
             if (saldoActual < saldoMinimoAlerta) {
@@ -303,7 +249,7 @@ public class Propietario extends Usuario {
     //---------------------------- Estado------------------------------------------- 
 
     public boolean estaDeshabilitado() { 
-        return estado.getNombre().equals(TipoEstado.DESHABILITADO); 
+        return estado.getNombre().equals("DESHABILITADO"); 
     }
 
     public void deshabilitar() throws PeajeException {
@@ -311,7 +257,7 @@ public class Propietario extends Usuario {
     }
 
     public boolean estaSuspendido() {
-        return estado.getNombre().equals(TipoEstado.SUSPENDIDO);
+        return estado.getNombre().equals("SUSPENDIDO");
     }
 
     public void suspender() throws PeajeException {
@@ -319,7 +265,7 @@ public class Propietario extends Usuario {
     }
 
     public boolean estaPenalizado() {
-        return estado.getNombre().equals(TipoEstado.PENALIZADO);
+        return estado.getNombre().equals("PENALIZADO");
     }
 
     public void penalizar() throws PeajeException {
@@ -327,7 +273,7 @@ public class Propietario extends Usuario {
     }
 
     public boolean estaHabilitado() {
-        return estado.getNombre().equals(TipoEstado.HABILITADO);
+        return estado.getNombre().equals("HABILITADO");
     }
 
     public void habilitar() throws PeajeException {

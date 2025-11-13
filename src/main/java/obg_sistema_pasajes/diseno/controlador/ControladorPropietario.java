@@ -69,7 +69,8 @@ public class ControladorPropietario implements Observador{
     public void actualizar(Object evento, Observable origen) {
         if(evento!=null && (evento.equals(Propietario.Eventos.CAMBIO_BONIFICACIONES) || 
                             evento.equals(Propietario.Eventos.CAMBIO_NOTIFICACIONES) ||
-                            evento.equals(Propietario.Eventos.CAMBIO_ESTADO))){
+                            evento.equals(Propietario.Eventos.CAMBIO_ESTADO) ||
+                            evento.equals(Propietario.Eventos.CAMBIO_TRANSITOS))){
             Propietario p = (Propietario) origen;
             conexionNavegador.enviarJSON(Respuesta.lista(new Respuesta("tableroData", p.obtenerTableroDto())));
         }
