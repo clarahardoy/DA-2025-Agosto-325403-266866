@@ -34,7 +34,7 @@ public class ControladorEstados implements Observador {
     }
 
     @PostMapping("/vista-conectada")
-    public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin", required = false) Administrador admin) throws PeajeException {
+    public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin") Administrador admin) throws PeajeException {
         return Respuesta.lista(estados());
     }
 

@@ -53,8 +53,17 @@ public class ControladorPropietario implements Observador{
         Sesion sesion = (Sesion) sesionHttp.getAttribute("usuarioPropietario");
         if(sesion == null) throw new PeajeException("Usuario no autenticado");
 
-        if(propietario!=null) propietario.quitarObservador(this);
-        propietario = (Propietario) sesion.getUsuario();
+        Propietario nuevoP = (Propietario) sesion.getUsuario();
+        
+        // solo actualizar si cambio el propietario o si es la primera vez q se loguea
+        if(propietario == null || !propietario.equals(nuevoP)) {
+            if(propietario != null) {
+                propietario.quitarObservador(this);
+            }
+            propietario = nuevoP;
+        }
+        
+        // agregar observador solo si no esta agregado
         propietario.agregarObservador(this);
 
         return Respuesta.lista(new Respuesta("tableroData", propietario.obtenerTableroDto()));
