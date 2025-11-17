@@ -10,7 +10,7 @@ import obg_sistema_pasajes.diseno.modelo.entidad.estado.TipoEstado;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import observador.Observable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +34,21 @@ public class ControladorEstados implements Observador {
     }
 
     @PostMapping("/vista-conectada")
-    public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin") Administrador admin) throws PeajeException {
+    public List<Respuesta> inicializarVista(HttpSession sesion) throws PeajeException {
+        Administrador admin = (Administrador) sesion.getAttribute("usuarioAdmin");
+        if (admin == null) {
+            return Respuesta.lista(new Respuesta("paginaLogin", "/login/administrador.html"));
+        }
+
+        if (propietario != null) {
+            return Respuesta.lista(
+                estados(),
+                new Respuesta("propietarioNombre", propietario.getNombreCompleto()),
+                new Respuesta("estadoActual", propietario.getEstado().getNombre()),
+                new Respuesta("cedulaPropietario", propietario.getCedula())
+            );
+        }
+
         return Respuesta.lista(estados());
     }
 

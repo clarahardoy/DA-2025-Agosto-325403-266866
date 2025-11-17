@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
+import obg_sistema_pasajes.diseno.dto.TableroPropietarioDto;
 import observador.Observable;
 import observador.Observador;
 import obg_sistema_pasajes.diseno.ConexionNavegador;
@@ -44,8 +45,7 @@ public class ControladorPropietario implements Observador{
 
 
         Propietario p = (Propietario) sesion.getUsuario();
-        Object dto = p.obtenerTableroDto();
-        return Respuesta.lista(new Respuesta("tableroData", dto));
+        return Respuesta.lista(new Respuesta("tableroData", TableroPropietarioDto.toDto(p)));
     }
 
     @PostMapping("/vistaConectada")
@@ -53,20 +53,11 @@ public class ControladorPropietario implements Observador{
         Sesion sesion = (Sesion) sesionHttp.getAttribute("usuarioPropietario");
         if(sesion == null) throw new PeajeException("Usuario no autenticado");
 
-        Propietario nuevoP = (Propietario) sesion.getUsuario();
-        
-        // solo actualizar si cambio el propietario o si es la primera vez q se loguea
-        if(propietario == null || !propietario.equals(nuevoP)) {
-            if(propietario != null) {
-                propietario.quitarObservador(this);
-            }
-            propietario = nuevoP;
-        }
-        
-        // agregar observador solo si no esta agregado
+        if(propietario!=null) propietario.quitarObservador(this);
+        propietario = (Propietario) sesion.getUsuario();
         propietario.agregarObservador(this);
 
-        return Respuesta.lista(new Respuesta("tableroData", propietario.obtenerTableroDto()));
+        return Respuesta.lista(new Respuesta("tableroData", TableroPropietarioDto.toDto(propietario)));
     }
 
     @PostMapping("/vistaCerrada")
@@ -76,12 +67,12 @@ public class ControladorPropietario implements Observador{
 
     @Override
     public void actualizar(Object evento, Observable origen) {
-        if(evento!=null && (evento.equals(Propietario.Eventos.CAMBIO_BONIFICACIONES) || 
+        if(evento!=null && (evento.equals(Propietario.Eventos.CAMBIO_BONIFICACIONES) ||
                             evento.equals(Propietario.Eventos.CAMBIO_NOTIFICACIONES) ||
                             evento.equals(Propietario.Eventos.CAMBIO_ESTADO) ||
                             evento.equals(Propietario.Eventos.CAMBIO_TRANSITOS))){
             Propietario p = (Propietario) origen;
-            conexionNavegador.enviarJSON(Respuesta.lista(new Respuesta("tableroData", p.obtenerTableroDto())));
+            conexionNavegador.enviarJSON(Respuesta.lista(new Respuesta("tableroData", TableroPropietarioDto.toDto(p))));
         }
     }
 

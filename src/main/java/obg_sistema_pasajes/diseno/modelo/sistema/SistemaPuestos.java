@@ -17,6 +17,14 @@ public class SistemaPuestos {
         return puestos;
     }
 
+    public List<String> getNombres() {
+        List<String> nombres = new ArrayList<>();
+        for (Puesto p : puestos) {
+            nombres.add(p.getNombre());
+        }
+        return nombres;
+    }
+
     public void agregarTarifaAPuesto(String nombrePuesto, double monto, CategoriaVehiculo categoria) {
         for (Puesto p : puestos) {
             if (p.getNombre().equals(nombrePuesto)) {

@@ -1,5 +1,7 @@
 package obg_sistema_pasajes.diseno.dto;
 
+import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
+
 public class VehiculoDto {
     public String matricula;
     public String modelo;
@@ -21,5 +23,16 @@ public class VehiculoDto {
         this.categoriaNombre = categoriaNombre;
         this.cantidadTransitos = cantidadTransitos;
         this.montoGastado = montoGastado;
+    }
+
+    public static VehiculoDto toDto(Vehiculo vehiculo) {
+        return new VehiculoDto(
+            vehiculo.getMatricula(),
+            vehiculo.getModelo(),
+            vehiculo.getColor(),
+            vehiculo.getCategoria().toString(),
+            vehiculo.getContadorTransitos(),
+            vehiculo.getTotalGastado()
+        );
     }
 }

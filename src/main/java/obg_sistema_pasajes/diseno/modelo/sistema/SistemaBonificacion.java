@@ -17,6 +17,14 @@ public class SistemaBonificacion {
         return new ArrayList<>(bonificaciones);
     }
 
+    public List<String> getNombres() {
+        List<String> nombres = new ArrayList<>();
+        for (Bonificacion b : bonificaciones) {
+            nombres.add(b.getNombre());
+        }
+        return nombres;
+    }
+
     public void asignarBonificacion(Propietario propietario, String nombreBonificacion, Puesto puesto) throws PeajeException {
         if (propietario == null) throw new PeajeException("No existe el propietario");
         if (puesto == null) throw new PeajeException("Debe especificar un puesto");

@@ -5,8 +5,6 @@ import java.util.Comparator;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
-import obg_sistema_pasajes.diseno.dto.TransitoDto;
-import java.text.SimpleDateFormat;
 
 
 public class Transito {
@@ -54,23 +52,6 @@ public class Transito {
         
         return montoConDescuento;
 }
-
-    public TransitoDto toDto() {
-        SimpleDateFormat sdfFecha = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm:ss");
-        
-        String puestoNombre = this.puesto != null ? this.puesto.getNombre() : "-";
-        String matricula = this.vehiculo != null ? this.vehiculo.getMatricula() : "-";
-        String categoriaNombre = this.tarifa != null ? this.tarifa.getCategoria().toString(): "-";
-        String nombreBonificacion = this.bonificacion != null ? this.bonificacion.getNombre() : "Ninguna";
-        double montoTarifa = this.tarifa != null ? this.tarifa.getMonto() : 0.0;
-        String fecha = this.fechaHora != null ? sdfFecha.format(this.fechaHora) : "-";
-        String hora = this.fechaHora != null ? sdfHora.format(this.fechaHora) : "-";
-        
-        return new TransitoDto(puestoNombre, matricula, categoriaNombre,
-                nombreBonificacion, montoTarifa, this.montoBonificado, 
-                this.montoPagado, fecha, hora);
-    }
 
     public Date getFechaHora() {
         return fechaHora;

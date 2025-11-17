@@ -1,7 +1,6 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 import java.util.Date;
 
-import obg_sistema_pasajes.diseno.dto.AsignacionDto;
 import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 
 public class Asignacion {
@@ -31,14 +30,8 @@ public class Asignacion {
         return puesto;
     }
 
-    public AsignacionDto toDto() {
-        return new AsignacionDto(
-            this.fechaAsignada.getTime(),
-            this.bonificacion.getNombre(),
-            this.puesto.getNombre()
-        );
+    public String getDescripcion() {
+        return bonificacion.getNombre() + " - " + puesto.getNombre();
     }
 
 }
-
-

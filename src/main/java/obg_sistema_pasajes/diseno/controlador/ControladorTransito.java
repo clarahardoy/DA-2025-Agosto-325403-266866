@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import jakarta.servlet.http.HttpSession;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,8 +15,10 @@ import java.text.SimpleDateFormat;
 import obg_sistema_pasajes.diseno.modelo.Fachada;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
+import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
 import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
+import obg_sistema_pasajes.diseno.dto.TransitoDto;
 import obg_sistema_pasajes.diseno.ConexionNavegador;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import observador.Observador;
@@ -36,11 +38,14 @@ public class ControladorTransito implements Observador {
 
 
     @PostMapping("/vista-conectada")
-    public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin") Administrador admin) throws PeajeException{
+    public List<Respuesta> inicializarVista(HttpSession sesion) throws PeajeException{
+        Administrador admin = (Administrador) sesion.getAttribute("usuarioAdmin");
+        if (admin == null) {
+            return Respuesta.lista(new Respuesta("paginaLogin", "/login/administrador.html"));
+        }
         if (administradorSesion != null) administradorSesion.quitarObservador(this);
         administradorSesion = admin;
         administradorSesion.agregarObservador(this);
-
         return buildInicialData();
     }
 
@@ -65,15 +70,20 @@ public class ControladorTransito implements Observador {
             Date fechaHoraTransito = dateFormat.parse(fechaHora);
             
             Vehiculo vehiculo = fachada.obtenerVehiculoPorMatricula(matricula);
-            if (vehiculo == null) {  
+            if (vehiculo == null) {
                 throw new PeajeException("No existe el vehículo");
             }
-            
+
+            Propietario propietario = vehiculo.getPropietario();
+            if (propietario == null) {
+                throw new PeajeException("El vehículo no tiene propietario asignado");
+            }
+
             Puesto puesto = fachada.obtenerPuestoPorNombre(puestoNombre);
-            Transito transito = fachada.registrarTransito(vehiculo, puesto, fechaHoraTransito);
- 
+            Transito transito = propietario.registrarTransito(vehiculo, puesto, fechaHoraTransito);
+
             return Respuesta.lista(
-                new Respuesta("resultadoTransito", transito.toDto())
+                new Respuesta("resultadoTransito", TransitoDto.toDtoParaAdmin(transito))
             );
             
         } catch (PeajeException e) {
@@ -82,7 +92,7 @@ public class ControladorTransito implements Observador {
             );
         } catch (Exception e) {
             return Respuesta.lista(
-                new Respuesta("error", "Error inesperado.")
+                new Respuesta("error", "Error inesperado: " + e.getMessage())
             );
         }
     }

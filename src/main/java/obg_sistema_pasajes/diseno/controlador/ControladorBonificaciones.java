@@ -8,15 +8,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.Fachada;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
-import obg_sistema_pasajes.diseno.modelo.entidad.Asignacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 import obg_sistema_pasajes.diseno.ConexionNavegador;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import observador.Observable;
@@ -38,35 +36,35 @@ public class ControladorBonificaciones implements Observador {
     }
 
     @PostMapping("/vistaConectada")
-    public List<Respuesta> inicializarVista(@SessionAttribute(name = "usuarioAdmin", required = false) Administrador admin) throws PeajeException {
+    public List<Respuesta> inicializarVista(HttpSession sesion) throws PeajeException {
+        Administrador admin = (Administrador) sesion.getAttribute("usuarioAdmin");
+        if (admin == null) {
+            return Respuesta.lista(new Respuesta("paginaLogin", "/login/administrador.html"));
+        }
+
         if (administradorSesion != null) administradorSesion.quitarObservador(this);
         administradorSesion = admin;
         administradorSesion.agregarObservador(this);
 
-        // Quitar observador del propietario anterior si existe
-        if (propietarioActual != null) propietarioActual.quitarObservador(this);
-        propietarioActual = null;
 
-        return buildInicialData();
+
+
+        List<Respuesta> respuestas = new ArrayList<>(buildInicialData());
+
+        if (propietarioActual != null) {
+            respuestas.add(new Respuesta("propietarioNombre", propietarioActual.getNombreCompleto()));
+            respuestas.add(new Respuesta("propietarioEstado", propietarioActual.getEstado().getNombre()));
+            respuestas.add(new Respuesta("bonificacionesAsignadas", propietarioActual.getDescripcionesBonificaciones()));
+            respuestas.add(new Respuesta("cedulaPropietario", propietarioActual.getCedula()));
+        }
+
+        return respuestas;
     }
 
     private List<Respuesta> buildInicialData(){
-        List<Bonificacion> bonificaciones = Fachada.getInstancia().listarBonificaciones();
-        List<Puesto> puestos = Fachada.getInstancia().listarPuestos();
-        
-        List<String> nombresBonificaciones = new ArrayList<>();
-        for (Bonificacion b : bonificaciones) {
-            nombresBonificaciones.add(b.getNombre());
-        }
-
-        List<String> nombresPuestos = new ArrayList<>();
-        for (Puesto p : puestos) {
-            nombresPuestos.add(p.getNombre());
-        }
-        
         return Respuesta.lista(
-            new Respuesta("bonificacionesDefinidas", nombresBonificaciones),
-            new Respuesta("puestosDefinidos", nombresPuestos)
+            new Respuesta("bonificacionesDefinidas", Fachada.getInstancia().getNombresBonificaciones()),
+            new Respuesta("puestosDefinidos", Fachada.getInstancia().getNombresPuestos())
         );
     }
     
@@ -86,15 +84,10 @@ public class ControladorBonificaciones implements Observador {
         propietarioActual = propietario;
         propietarioActual.agregarObservador(this);
 
-        List<String> bonificacionesAsignadas = new ArrayList<>();
-        for (Asignacion asignacion : propietario.getBonificacionesAsignadas()) {
-            bonificacionesAsignadas.add(asignacion.getBonificacion().getNombre() + " - " + asignacion.getPuesto().getNombre());
-        }
-
         return Respuesta.lista(
             new Respuesta("propietarioNombre", propietario.getNombreCompleto()),
             new Respuesta("propietarioEstado", propietario.getEstado().getNombre()),
-            new Respuesta("bonificacionesAsignadas", bonificacionesAsignadas)
+            new Respuesta("bonificacionesAsignadas", propietario.getDescripcionesBonificaciones())
         );
     }
     
@@ -149,13 +142,8 @@ public class ControladorBonificaciones implements Observador {
     private List<Respuesta> buildBonificacionesAsignadas() {
         if (propietarioActual == null) return new ArrayList<>();
 
-        List<String> bonificacionesAsignadas = new ArrayList<>();
-        for (Asignacion asignacion : propietarioActual.getBonificacionesAsignadas()) {
-            bonificacionesAsignadas.add(asignacion.getBonificacion().getNombre() + " - " + asignacion.getPuesto().getNombre());
-        }
-
         return Respuesta.lista(
-            new Respuesta("bonificacionesAsignadas", bonificacionesAsignadas)
+            new Respuesta("bonificacionesAsignadas", propietarioActual.getDescripcionesBonificaciones())
         );
     }
 

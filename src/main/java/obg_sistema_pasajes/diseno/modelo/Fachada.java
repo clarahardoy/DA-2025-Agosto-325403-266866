@@ -6,7 +6,6 @@ import obg_sistema_pasajes.diseno.modelo.sistema.SistemaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.sistema.SistemaBonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Tarifa;
-import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
@@ -15,7 +14,6 @@ import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import obg_sistema_pasajes.diseno.modelo.entidad.estado.TipoEstado;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
@@ -74,6 +72,10 @@ public class Fachada extends Observable {
         return SPuesto.listarPuestos();
     }
 
+    public List<String> getNombresPuestos() {
+        return SPuesto.getNombres();
+    }
+
     public List<Tarifa> obtenerTarifasPuesto(String nombrePuesto) {
         return SPuesto.obtenerTarifasPuesto(nombrePuesto);
     }
@@ -101,18 +103,14 @@ public class Fachada extends Observable {
         return sAcceso.obtenerPropietarioPorCedula(cedula);
     }
 
-    public Transito registrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException {
-        Propietario propietario = vehiculo.getPropietario();
-        if (propietario == null) {
-            throw new PeajeException("El vehículo no tiene propietario asignado");
-        }
-        return propietario.registrarTransito(vehiculo, puesto, fechaHora);
-    }
-
     //-----------------BONIFICACIONES-----------------
 
     public List<Bonificacion> listarBonificaciones() {
         return SBonificacion.listarBonificaciones();
+    }
+
+    public List<String> getNombresBonificaciones() {
+        return SBonificacion.getNombres();
     }
 
     public Bonificacion obtenerBonificacionPorNombre(String nombre) {

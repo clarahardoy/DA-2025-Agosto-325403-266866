@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 
-import obg_sistema_pasajes.diseno.dto.TableroPropietarioDto;
 import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado;
 import obg_sistema_pasajes.diseno.modelo.entidad.estado.EstadoHabilitado;
@@ -68,50 +67,20 @@ public class Propietario extends Usuario {
         return bonificacionesAsignadas;
     }
 
+    public List<String> getDescripcionesBonificaciones() {
+        List<String> descripciones = new ArrayList<>();
+        for (Asignacion asignacion : bonificacionesAsignadas) {
+            descripciones.add(asignacion.getDescripcion());
+        }
+        return descripciones;
+    }
+
     public List<Transito> getTransitos() {
         return transitos;
     }
 
     public List<Notificacion> getNotificaciones() {
         return notificaciones;
-    }
-
-
-
-    //-------------------Tablero DTO-----------------------------------------------------------------
-    public TableroPropietarioDto obtenerTableroDto() {
-
-        TableroPropietarioDto dto = new TableroPropietarioDto();
-        dto.nombreCompleto = this.getNombreCompleto();
-        dto.estado = this.estado.getNombre().toString();
-        dto.saldoActual = this.saldoActual;
-
-        // mapear 
-        for (Asignacion asignacion : this.bonificacionesAsignadas) {
-            dto.bonificaciones.add(asignacion.toDto());
-        }
-
-        for (Vehiculo vehiculo : this.vehiculos) {
-            dto.vehiculos.add(vehiculo.toDto());
-        }
-    
-        for (Transito transito : obtenerTransitosOrdenados()) {
-            dto.transitos.add(transito.toDto());
-        }
-
-        // ordenar notificaciones por fechaHora descendente 
-        this.notificaciones.sort((notificacion1, notificacion2) -> {
-            if (notificacion1.getFechaHora() == null && notificacion2.getFechaHora() == null) return 0;
-            if (notificacion1.getFechaHora() == null) return 1;
-            if (notificacion2.getFechaHora() == null) return -1;
-            return notificacion2.getFechaHora().compareTo(notificacion1.getFechaHora());
-        });
-        
-        for (Notificacion notif : this.notificaciones) {
-            dto.notificaciones.add(notif.toDto());
-        }
-
-    return dto;
     }
 
 
@@ -207,13 +176,6 @@ public class Propietario extends Usuario {
         avisar(Eventos.CAMBIO_TRANSITOS);
         return transito;
     }
-
-    private List<Transito> obtenerTransitosOrdenados() {
-        List<Transito> copia = new ArrayList<>(this.transitos);
-        copia.sort(Transito.porFechaDescendente());
-        return copia;
-    }
-    
 
     //---------------------------- Estado------------------------------------------- 
 
