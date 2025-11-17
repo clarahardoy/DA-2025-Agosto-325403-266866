@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
+import obg_sistema_pasajes.diseno.dto.VehiculoDto;
+
 public class Vehiculo {
     private String matricula;
     private String modelo;
@@ -18,6 +20,15 @@ public class Vehiculo {
         this.modelo = modelo;
         this.color = color;
         this.categoria = categoria;
+    }
+
+    public VehiculoDto toDto() {
+        String categoriaNombre = this.categoria != null ? 
+            this.categoria.getNombreCategoria().toString() : null;
+        
+        return new VehiculoDto(this.matricula, this.modelo, this.color, 
+                               categoriaNombre, this.getContadorTransitos(), 
+                               this.getTotalGastado());
     }
 
     public String getMatricula() {

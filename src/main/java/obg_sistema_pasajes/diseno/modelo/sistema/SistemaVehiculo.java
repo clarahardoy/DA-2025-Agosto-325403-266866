@@ -5,23 +5,10 @@ import java.util.List;
 import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
-import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo.NombreCategoria;
 
 public class SistemaVehiculo {
     private List<Vehiculo> vehiculos = new ArrayList<>();
 
-
-    // va ? ---------------------------------------------------
-    private List<CategoriaVehiculo> categorias = new ArrayList<>();
-
-    public void agregarCategoria(NombreCategoria nombre) {
-        categorias.add(new CategoriaVehiculo(nombre));
-    }
-
-    public List<CategoriaVehiculo> listarCategorias() {
-        return categorias;
-    }
-    // -------------------------------------------------------
 
     public void agregarVehiculoAPropietario(Propietario propietario, String matricula, String modelo, String color, CategoriaVehiculo categoria) {
         Vehiculo v = new Vehiculo(matricula, modelo, color, categoria);

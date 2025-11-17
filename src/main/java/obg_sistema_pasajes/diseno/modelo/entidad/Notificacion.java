@@ -3,6 +3,8 @@ package obg_sistema_pasajes.diseno.modelo.entidad;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import obg_sistema_pasajes.diseno.dto.NotificacionDto;
+
 public class Notificacion {
     private Date fechaHora;
     private String mensaje;
@@ -10,6 +12,10 @@ public class Notificacion {
     public Notificacion(String mensaje) {
         this.fechaHora = new Date();
         this.mensaje = mensaje;
+    }
+
+    public NotificacionDto toDto() {
+        return new NotificacionDto(this.getMensaje());
     }
     
     public Date getFechaHora() { return fechaHora; }

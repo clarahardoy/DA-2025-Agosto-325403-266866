@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 
-import obg_sistema_pasajes.diseno.dto.NotificacionDto;
 import obg_sistema_pasajes.diseno.dto.TableroPropietarioDto;
-import obg_sistema_pasajes.diseno.dto.TransitoDto;
-import obg_sistema_pasajes.diseno.dto.VehiculoDto;
 import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado;
 import obg_sistema_pasajes.diseno.modelo.entidad.estado.EstadoHabilitado;
@@ -83,66 +80,39 @@ public class Propietario extends Usuario {
 
     //-------------------Tablero DTO-----------------------------------------------------------------
     public TableroPropietarioDto obtenerTableroDto() {
-    TableroPropietarioDto dto = new TableroPropietarioDto();
-    dto.nombreCompleto = this.getNombreCompleto();
-    dto.estado = this.estado.getNombre().toString();
-    dto.saldoActual = this.saldoActual;
 
-    // mapear 
-    for (Asignacion a : this.bonificacionesAsignadas) {
-        dto.bonificaciones.add(a.toDto());
-    }
-    for (Vehiculo v : this.vehiculos) {
-        String categoriaNombre = v.getCategoria() != null ? v.getCategoria().getNombreCategoria().toString() : null;
-        int contador = v.getContadorTransitos();
-        double gastado = v.getTotalGastado();
-        dto.vehiculos.add(new VehiculoDto(v.getMatricula(), v.getModelo(), v.getColor(), categoriaNombre, contador, gastado));
-    }
-    // ordenar transitos por fechaHora descendente 
-    this.transitos.sort((a, b) -> {
-        if (a.getFechaHora() == null && b.getFechaHora() == null) return 0;
-        if (a.getFechaHora() == null) return 1;
-        if (b.getFechaHora() == null) return -1;
-        return b.getFechaHora().compareTo(a.getFechaHora());
-    });
+        TableroPropietarioDto dto = new TableroPropietarioDto();
+        dto.nombreCompleto = this.getNombreCompleto();
+        dto.estado = this.estado.getNombre().toString();
+        dto.saldoActual = this.saldoActual;
 
-    SimpleDateFormat sdfFecha = new SimpleDateFormat("yyyy-MM-dd");
-    SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm:ss");
-    for (Transito t : this.transitos) {
-        String puestoNombre = t.getPuesto() != null ? t.getPuesto().getNombre() : "-";
-        String matricula = t.getVehiculo() != null ? t.getVehiculo().getMatricula() : "-";
-        String categoriaNombre = t.getCategoria() != null ? t.getCategoria().getNombreCategoria().toString() : "-";
-        String nombreBonificacion = t.getBonificacion() != null ? t.getBonificacion().getNombre() : "Ninguna";
-        double montoTarifa = t.getTarifa() != null ? t.getTarifa().getMonto() : 0.0;
-        double montoBonificado = t.getMontoBonificado();
-        double montoPagado = t.getMontoPagado();
-        String fecha = t.getFechaHora() != null ? sdfFecha.format(t.getFechaHora()) : "-";
-        String hora = t.getFechaHora() != null ? sdfHora.format(t.getFechaHora()) : "-";
+        // mapear 
+        for (Asignacion asignacion : this.bonificacionesAsignadas) {
+            dto.bonificaciones.add(asignacion.toDto());
+        }
 
-        dto.transitos.add(new TransitoDto(puestoNombre, matricula, categoriaNombre,
-                nombreBonificacion, montoTarifa, montoBonificado, montoPagado, fecha, hora));
-    }
-    // ordenar notificaciones por fechaHora descendente 
-    this.notificaciones.sort((a, b) -> {
-        if (a.getFechaHora() == null && b.getFechaHora() == null) return 0;
-        if (a.getFechaHora() == null) return 1;
-        if (b.getFechaHora() == null) return -1;
-        return b.getFechaHora().compareTo(a.getFechaHora());
-    });
-    for (Notificacion n : this.notificaciones) {
-        dto.notificaciones.add(new NotificacionDto(n.getMensaje()));
-    }
+        for (Vehiculo vehiculo : this.vehiculos) {
+            dto.vehiculos.add(vehiculo.toDto());
+        }
+    
+        for (Transito transito : obtenerTransitosOrdenados()) {
+            dto.transitos.add(transito.toDto());
+        }
+
+        // ordenar notificaciones por fechaHora descendente 
+        this.notificaciones.sort((notificacion1, notificacion2) -> {
+            if (notificacion1.getFechaHora() == null && notificacion2.getFechaHora() == null) return 0;
+            if (notificacion1.getFechaHora() == null) return 1;
+            if (notificacion2.getFechaHora() == null) return -1;
+            return notificacion2.getFechaHora().compareTo(notificacion1.getFechaHora());
+        });
+        
+        for (Notificacion notif : this.notificaciones) {
+            dto.notificaciones.add(notif.toDto());
+        }
 
     return dto;
     }
-//-------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
 
 
 //---------------------------- BONIFICACIONES -------------------------------------------
@@ -181,10 +151,7 @@ public class Propietario extends Usuario {
 
 
 
-
-
-
-    //-------------------------------------------TRANSITOS---------------------------------------------- 
+//-------------------------------------------TRANSITOS---------------------------------------------- 
 
     public void validarPuedeRealizarTransito() throws PeajeException {
         if (estaDeshabilitado()) {
@@ -215,12 +182,9 @@ public class Propietario extends Usuario {
  
         validarPuedeRealizarTransito();
 
-        // Resolver bonificación asignada (el experto que elige es el Propietario)
         Bonificacion bonificacion = getBonificacionParaPuesto(puesto);
-        // Crear el tránsito (el experto que aplica es Transito)
         Transito transito = new Transito(vehiculo, puesto, this, fechaHora, bonificacion);
         
-        // Verificar saldo y descontar
         double montoPagado = transito.getMontoPagado();
         if (!tieneSaldoSuficiente(montoPagado)) {
             throw new PeajeException("Saldo insuficiente: " + this.saldoActual);
@@ -241,8 +205,13 @@ public class Propietario extends Usuario {
         }
         
         avisar(Eventos.CAMBIO_TRANSITOS);
-
         return transito;
+    }
+
+    private List<Transito> obtenerTransitosOrdenados() {
+        List<Transito> copia = new ArrayList<>(this.transitos);
+        copia.sort(Transito.porFechaDescendente());
+        return copia;
     }
     
 
@@ -287,8 +256,6 @@ public class Propietario extends Usuario {
     }
 
 
-
-
     protected void hacerRegistrarTransito() {
         this.estado.registrarTransito();
     }
@@ -315,7 +282,6 @@ public class Propietario extends Usuario {
         this.saldoActual -= monto;
     }
 
-    
     //---------------------------- NOTIFICACIONES------------------------------------------- 
 
     public void agregarNotificacion(String mensaje) {
@@ -325,8 +291,7 @@ public class Propietario extends Usuario {
 
     public void verificarYNotificarSaldoBajo() {
         if (this.saldoActual < this.saldoMinimoAlerta) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String fecha = sdf.format(new Date());
+            String fecha = obtenerFechaHoraActual();
             String mensaje = fecha + " Tu saldo actual es de $ " + this.saldoActual + 
                 " Te recomendamos hacer una recarga";
             agregarNotificacion(mensaje);
@@ -334,16 +299,14 @@ public class Propietario extends Usuario {
     }
 
     private void registrarNotificacionTransito(Puesto puesto, Vehiculo vehiculo) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String fecha = sdf.format(new Date());
+        String fecha = obtenerFechaHoraActual();
         String mensaje = fecha + " Pasaste por el puesto " + puesto.getNombre() + 
                         " con el vehículo " + vehiculo.getMatricula();
         agregarNotificacion(mensaje);
     }
 
     private void registrarNotificacionSaldoBajo() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String fecha = sdf.format(new Date());
+        String fecha = obtenerFechaHoraActual();
         String mensaje = fecha + " Tu saldo actual es de $ " + saldoActual + 
                         " Te recomendamos hacer una recarga";
         agregarNotificacion(mensaje);
@@ -352,6 +315,11 @@ public class Propietario extends Usuario {
     public void borrarNotificaciones() {
         this.notificaciones.clear();
         avisar(Eventos.CAMBIO_NOTIFICACIONES);
+    }
+
+    private String obtenerFechaHoraActual() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(new Date());
     }
 }
 

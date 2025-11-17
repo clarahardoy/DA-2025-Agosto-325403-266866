@@ -1,9 +1,12 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 import java.util.Date;
 import java.util.List;
+import java.util.Comparator;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
+import obg_sistema_pasajes.diseno.dto.TransitoDto;
+import java.text.SimpleDateFormat;
 
 
 public class Transito {
@@ -17,43 +20,60 @@ public class Transito {
     private double montoBonificado;
     private double montoPagado;
 
-
-
     public Transito(Vehiculo vehiculo, Puesto puesto, Propietario propietario, Date fechaHora) throws PeajeException {
         this(vehiculo, puesto, propietario, fechaHora, propietario.getBonificacionParaPuesto(puesto));
     }
 
-    public Transito(Vehiculo vehiculo, Puesto puesto, Propietario propietario, Date fechaHora, Bonificacion bonificacion) throws PeajeException {
+    public Transito(Vehiculo vehiculo, Puesto puesto, Propietario propietario, 
+                Date fechaHora, Bonificacion bonificacion) throws PeajeException {
         this.vehiculo = vehiculo;
         this.puesto = puesto;
         this.propietario = propietario;
         this.fechaHora = fechaHora;
-
-        // Obtener tarifa según categoría del vehículo
-        this.tarifa = puesto.obtenerTarifaPorCategoria(vehiculo.getCategoria());
-        double montoBase = tarifa.getMonto();
-
-        this.montoPagado = montoBase;
-        this.montoBonificado = 0.0;
-        this.bonificacionAplicada = false;
-
-        // Aplicar bonificación si corresponde
         this.bonificacion = bonificacion;
-        if (this.bonificacion != null && !propietario.estaPenalizado()) {
-            List<Transito> transitosDelDia = vehiculo.getTransitosDelDia(puesto, fechaHora);
-            this.montoPagado = this.bonificacion.aplicarBonificacion(montoBase, vehiculo, transitosDelDia, fechaHora);
-            this.bonificacionAplicada = (this.montoPagado != montoBase);
-            this.montoBonificado = montoBase - this.montoPagado;
+        this.tarifa = puesto.obtenerTarifaPorCategoria(vehiculo.getCategoria());
+        this.montoPagado = calcularMontoPagado(); 
+    }
+
+    private double calcularMontoPagado() {
+        double montoBase = tarifa.getMonto();
+        
+        if (bonificacion == null || propietario.estaPenalizado()) {
+            this.bonificacionAplicada = false;
+            this.montoBonificado = 0.0;
+            return montoBase;
         }
+    
+        List<Transito> transitosDelDia = vehiculo.getTransitosDelDia(puesto, fechaHora);
+        double montoConDescuento = bonificacion.aplicarBonificacion(
+            montoBase, vehiculo, transitosDelDia, fechaHora
+        );
+        
+        this.bonificacionAplicada = (montoConDescuento != montoBase);
+        this.montoBonificado = montoBase - montoConDescuento;
+        
+        return montoConDescuento;
+}
+
+    public TransitoDto toDto() {
+        SimpleDateFormat sdfFecha = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdfHora = new SimpleDateFormat("HH:mm:ss");
+        
+        String puestoNombre = this.puesto != null ? this.puesto.getNombre() : "-";
+        String matricula = this.vehiculo != null ? this.vehiculo.getMatricula() : "-";
+        String categoriaNombre = this.tarifa != null ? this.tarifa.getCategoria().toString(): "-";
+        String nombreBonificacion = this.bonificacion != null ? this.bonificacion.getNombre() : "Ninguna";
+        double montoTarifa = this.tarifa != null ? this.tarifa.getMonto() : 0.0;
+        String fecha = this.fechaHora != null ? sdfFecha.format(this.fechaHora) : "-";
+        String hora = this.fechaHora != null ? sdfHora.format(this.fechaHora) : "-";
+        
+        return new TransitoDto(puestoNombre, matricula, categoriaNombre,
+                nombreBonificacion, montoTarifa, this.montoBonificado, 
+                this.montoPagado, fecha, hora);
     }
 
     public Date getFechaHora() {
         return fechaHora;
-    }
-
-
-    public void setFechaHora(Date fechaHora) {
-        this.fechaHora = fechaHora;
     }
 
 
@@ -62,18 +82,8 @@ public class Transito {
     }
 
 
-    public void setVehiculo(Vehiculo vehiculo) {
-        this.vehiculo = vehiculo;
-    }
-
-
     public Puesto getPuesto() {
         return puesto;
-    }
-
-
-    public void setPuesto(Puesto puesto) {
-        this.puesto = puesto;
     }
 
 
@@ -92,18 +102,8 @@ public class Transito {
     }
 
 
-    public void setTarifa(Tarifa tarifa) {
-        this.tarifa = tarifa;
-    }
-
-
     public Bonificacion getBonificacion() {
         return bonificacion;
-    }
-
-
-    public void setBonificacion(Bonificacion bonificacion) {
-        this.bonificacion = bonificacion;
     }
 
 
@@ -112,28 +112,13 @@ public class Transito {
     }
 
 
-    public void setBonificacionAplicada(boolean bonificacionAplicada) {
-        this.bonificacionAplicada = bonificacionAplicada;
-    }
-
-
     public double getMontoBonificado() {
         return  montoBonificado;
     }
 
 
-    public void setMontoBonificado(double montoBonificacion) {
-        this.montoBonificado = montoBonificacion;
-    }
-
-
     public double getMontoPagado() {
         return montoPagado;
-    }
-
-
-    public void setMontoPagado(double montoPagado) {
-        this.montoPagado = montoPagado;
     }
 
     public double getMontoBase() {
@@ -144,5 +129,13 @@ public class Transito {
         return tarifa.getCategoria();
     }
 
+    public static Comparator<Transito> porFechaDescendente() {
+        return (transito1, transito2) -> {
+            if (transito1.getFechaHora() == null && transito2.getFechaHora() == null) return 0;
+            if (transito1.getFechaHora() == null) return 1;
+            if (transito2.getFechaHora() == null) return -1;
+            return transito2.getFechaHora().compareTo(transito1.getFechaHora());
+        };
+    }
             
 }

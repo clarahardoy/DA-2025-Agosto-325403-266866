@@ -17,7 +17,6 @@ import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
 import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
-import obg_sistema_pasajes.diseno.dto.TransitoDto;
 import obg_sistema_pasajes.diseno.ConexionNavegador;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import observador.Observador;
@@ -72,11 +71,9 @@ public class ControladorTransito implements Observador {
             
             Puesto puesto = fachada.obtenerPuestoPorNombre(puestoNombre);
             Transito transito = fachada.registrarTransito(vehiculo, puesto, fechaHoraTransito);
-            
-            TransitoDto transitoDto = construirTransitoDto(transito);
-            
+ 
             return Respuesta.lista(
-                new Respuesta("resultadoTransito", transitoDto)
+                new Respuesta("resultadoTransito", transito.toDto())
             );
             
         } catch (PeajeException e) {
@@ -85,21 +82,9 @@ public class ControladorTransito implements Observador {
             );
         } catch (Exception e) {
             return Respuesta.lista(
-                new Respuesta("error", "Error inesperado: " + e.getMessage())
+                new Respuesta("error", "Error inesperado.")
             );
         }
-    }
-
-    private TransitoDto construirTransitoDto(Transito transito) {
-        return new TransitoDto(
-            transito.getPropietario().getNombreCompleto(),
-            transito.getPropietario().getEstado().getNombre().toString(),
-            transito.getCategoria().getNombreCategoria().toString(),
-            transito.getBonificacion() != null ? 
-            transito.getBonificacion().getNombre() : "Ninguna",
-            transito.getMontoPagado(),
-            transito.getPropietario().getSaldoActual()
-        );
     }
 
     @PostMapping("/vistaCerrada")
