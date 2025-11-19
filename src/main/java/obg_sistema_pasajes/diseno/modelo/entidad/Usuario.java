@@ -1,6 +1,7 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 
 import observador.Observable;
+import obg_sistema_pasajes.diseno.exception.PeajeException;
 
 public abstract class Usuario extends Observable {
     private String nombreCompleto;
@@ -38,15 +39,15 @@ public abstract class Usuario extends Observable {
         return this.cedula != null && this.cedula.equals(otro.cedula);
     }
 
-    public void validar() throws IllegalArgumentException {
+    public void validar() throws PeajeException {
         if (nombreCompleto == null || nombreCompleto.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre completo es requerido");
+            throw new PeajeException("El nombre completo es requerido");
         }
         if (password == null || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("La contraseña es requerida");
+            throw new PeajeException("La contraseña es requerida");
         }
         if (cedula == null || cedula.trim().isEmpty()) {
-            throw new IllegalArgumentException("La cédula es requerida");
+            throw new PeajeException("La cédula es requerida");
         }
     }
 }

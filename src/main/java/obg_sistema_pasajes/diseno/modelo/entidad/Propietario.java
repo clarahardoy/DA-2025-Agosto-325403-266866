@@ -43,6 +43,10 @@ public class Propietario extends Usuario {
         return saldoMinimoAlerta;
     }
 
+    public boolean tieneSaldoBajo() {
+        return saldoActual < saldoMinimoAlerta;
+    }
+
     public void setSaldoMinimoAlerta(double saldoMinimoAlerta) {
         this.saldoMinimoAlerta = saldoMinimoAlerta;
     }
@@ -85,14 +89,9 @@ public class Propietario extends Usuario {
 
 
 //---------------------------- BONIFICACIONES -------------------------------------------
-    public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
-        // Validar que el propietario esté habilitado
-        if (estaDeshabilitado()) {
-            throw new PeajeException("El propietario esta deshabilitado. No se pueden asignar bonificaciones");
-        }
-
+    public void hacerAsignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
         // Verificar si ya tiene una bonificación para ese puesto
-        if (tieneBonificacionEnPuesto(puesto)) {
+         if (tieneBonificacionEnPuesto(puesto)) {
             throw new PeajeException("Ya tiene una bonificación asignada para ese puesto");
         }
 
@@ -101,6 +100,21 @@ public class Propietario extends Usuario {
         this.bonificacionesAsignadas.add(nuevaAsignacion);
         // Avisar a los observadores que cambió la lista de bonificaciones
         avisar(Eventos.CAMBIO_BONIFICACIONES);
+
+    }
+
+    public double hacerAplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy) {
+        if (bonificacion == null) return 0.0;
+        return bonificacion.calcularMontoConDescuento(montoTarifa, vehiculo, transitosHoy);
+
+    }
+
+    protected void aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy) {
+        estado.aplicarDescuentoPorBonificacionesAsignadas(bonificacion, montoTarifa, vehiculo, transitosHoy);
+    }
+
+    public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
+        estado.asignarBonificacion(bonificacion, puesto);    
     }
 
 
@@ -122,15 +136,6 @@ public class Propietario extends Usuario {
 
 //-------------------------------------------TRANSITOS---------------------------------------------- 
 
-    public void validarPuedeRealizarTransito() throws PeajeException {
-        if (estaDeshabilitado()) {
-            throw new PeajeException("El propietario del vehículo está deshabilitado, no puede realizar tránsitos");
-        }
-        if (estaSuspendido()) {
-            throw new PeajeException("El propietario del vehículo está suspendido, no puede realizar tránsitos");
-        }
-    }
-
     public void agregarTransito(Transito transito) {
         this.transitos.add(transito);
     }
@@ -144,37 +149,48 @@ public class Propietario extends Usuario {
         return null;
     }
 
-    public Transito registrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException {
+    public Transito hacerRegistrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException {
         if (!this.vehiculos.contains(vehiculo)) {
             throw new PeajeException("El vehículo no pertenece a este propietario");
         }
  
-        validarPuedeRealizarTransito();
-
         Bonificacion bonificacion = getBonificacionParaPuesto(puesto);
         Transito transito = new Transito(vehiculo, puesto, this, fechaHora, bonificacion);
         
-        double montoPagado = transito.getMontoPagado();
-        if (!tieneSaldoSuficiente(montoPagado)) {
+        // Delegar al estado saber si aplica o no el descuento en las bonificaciones ya asignadas
+        double montoConDescuento = estado.aplicarDescuentoPorBonificacionesAsignadas(
+            bonificacion, 
+            transito.getMontoBase(), 
+            vehiculo, 
+            vehiculo.getTransitosDelDia(puesto, fechaHora)
+        );
+
+        double descuento = transito.getMontoBase() - montoConDescuento;
+        transito.aplicarDescuento(descuento);
+        
+        double montoAPagar = transito.getMontoPagado();
+
+        if (!tieneSaldoSuficiente(montoAPagar)) {
             throw new PeajeException("Saldo insuficiente: " + this.saldoActual);
         }
-        this.descontarSaldo(montoPagado);
+        this.descontarSaldo(montoAPagar);
         
         // Agregar a las listas
-        this.transitos.add(transito);
+        this.agregarTransito(transito);
         vehiculo.agregarTransito(transito);
         
-        // Notificaciones
-        if (!this.estado.getNombre().equals("PENALIZADO")) {
-            registrarNotificacionTransito(puesto, vehiculo);
-            
-            if (saldoActual < saldoMinimoAlerta) {
-                registrarNotificacionSaldoBajo();
-            }
+        //se delega al estado porque si esta penalizado no se tiene que mandar (depende del estado)
+        estado.registrarNotificacion("Se ha registrado un transito en el puesto " + puesto.getNombre() + " con el vehículo " + vehiculo.getMatricula());
+        if (tieneSaldoBajo()) {
+            estado.registrarNotificacion("Tu saldo actual es de $ " + this.saldoActual + " Te recomendamos hacer una recarga");
         }
-        
         avisar(Eventos.CAMBIO_TRANSITOS);
         return transito;
+       
+    }
+
+    public Transito registrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException {
+        return estado.registrarTransito(vehiculo, puesto, fechaHora);
     }
 
     //---------------------------- Estado------------------------------------------- 
@@ -213,25 +229,8 @@ public class Propietario extends Usuario {
 
     public void cambiarEstado(Estado estado) throws PeajeException {
         this.estado = estado;
-        hacerRegistrarNotificacion();
+        hacerRegistrarNotificacion("Se ha cambiado tu estado en el sistema. Tu estado actual es " + this.estado.getNombre());
         avisar(Eventos.CAMBIO_ESTADO);
-    }
-
-
-    protected void hacerRegistrarTransito() {
-        this.estado.registrarTransito();
-    }
-
-    protected void hacerAsignarBonificacion() {
-        this.estado.asignarBonificacion();
-    }
-
-    protected void hacerAplicarDescuento() {
-        this.estado.aplicarDescuento();
-    }
-
-    protected void hacerRegistrarNotificacion() {
-        this.estado.registrarNotificacion();
     }
 
     //---------------------------- Saldo------------------------------------------- 
@@ -251,29 +250,6 @@ public class Propietario extends Usuario {
         avisar(Eventos.CAMBIO_NOTIFICACIONES);
     }
 
-    public void verificarYNotificarSaldoBajo() {
-        if (this.saldoActual < this.saldoMinimoAlerta) {
-            String fecha = obtenerFechaHoraActual();
-            String mensaje = fecha + " Tu saldo actual es de $ " + this.saldoActual + 
-                " Te recomendamos hacer una recarga";
-            agregarNotificacion(mensaje);
-        }
-    }
-
-    private void registrarNotificacionTransito(Puesto puesto, Vehiculo vehiculo) {
-        String fecha = obtenerFechaHoraActual();
-        String mensaje = fecha + " Pasaste por el puesto " + puesto.getNombre() + 
-                        " con el vehículo " + vehiculo.getMatricula();
-        agregarNotificacion(mensaje);
-    }
-
-    private void registrarNotificacionSaldoBajo() {
-        String fecha = obtenerFechaHoraActual();
-        String mensaje = fecha + " Tu saldo actual es de $ " + saldoActual + 
-                        " Te recomendamos hacer una recarga";
-        agregarNotificacion(mensaje);
-    }
-
     public void borrarNotificaciones() {
         this.notificaciones.clear();
         avisar(Eventos.CAMBIO_NOTIFICACIONES);
@@ -283,5 +259,18 @@ public class Propietario extends Usuario {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(new Date());
     }
+
+    public void hacerRegistrarNotificacion(String mensaje) {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String fechaHora = formatter.format(new java.util.Date());
+        String mensajeCompleto = "[" + fechaHora + "] " + mensaje;
+        this.agregarNotificacion(mensajeCompleto);
+    }
+
+    public void registrarNotificacion(String mensaje) {
+        estado.registrarNotificacion(mensaje);
+    }
+
+
 }
 

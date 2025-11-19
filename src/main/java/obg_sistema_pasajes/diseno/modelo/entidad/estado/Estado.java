@@ -2,6 +2,12 @@ package obg_sistema_pasajes.diseno.modelo.entidad.estado;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
+import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
+import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
+import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
+import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
+import java.util.Date;
+import java.util.List;
 
 public abstract class Estado {
     private String nombre;
@@ -29,24 +35,13 @@ public abstract class Estado {
 
     public abstract boolean puedeLoguearse() throws PeajeException;
 
-    public void registrarTransito() {
+    public abstract Transito registrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException;
 
-    }
+    public abstract void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException;
 
-    public void asignarBonificacion() {
+    public abstract double aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy);
 
-    }
-
-    public void aplicarDescuento() {
-
-    }
-
-    public void registrarNotificacion() {
-        java.text.SimpleDateFormat formatter = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        String fechaHora = formatter.format(new java.util.Date());
-        String mensaje = "[" + fechaHora + "] Se ha cambiado tu estado en el sistema. Tu estado actual es " + getNombre();
-        getPropietario().agregarNotificacion(mensaje);
-    }
+    public abstract void registrarNotificacion(String mensaje);
 
     @Override
     public String toString() {

@@ -121,7 +121,6 @@ public class Fachada extends Observable {
         SBonificacion.asignarBonificacion(propietario, nombreBonificacion, puesto);
     }
 
-    // Nuevo: permitir que la fachada agregue una bonificación al sistema
     public void agregarBonificacion(String  nombre) {
         SBonificacion.agregarBonificacion(nombre);
     }

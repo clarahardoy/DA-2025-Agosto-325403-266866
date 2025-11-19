@@ -1,6 +1,5 @@
 package obg_sistema_pasajes.diseno.modelo.entidad;
 import java.util.Date;
-import java.util.List;
 import java.util.Comparator;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
@@ -30,28 +29,18 @@ public class Transito {
         this.fechaHora = fechaHora;
         this.bonificacion = bonificacion;
         this.tarifa = puesto.obtenerTarifaPorCategoria(vehiculo.getCategoria());
-        this.montoPagado = calcularMontoPagado(); 
+        this.bonificacionAplicada = false;
+        this.montoBonificado = 0.0;
+        this.montoPagado = tarifa.getMonto();
     }
 
-    private double calcularMontoPagado() {
-        double montoBase = tarifa.getMonto();
-        
-        if (bonificacion == null || propietario.estaPenalizado()) {
-            this.bonificacionAplicada = false;
-            this.montoBonificado = 0.0;
-            return montoBase;
+    public void aplicarDescuento(double descuento) {
+        if (descuento > 0) {
+            this.bonificacionAplicada = true;
+            this.montoBonificado = descuento;
+            this.montoPagado = tarifa.getMonto() - descuento;
         }
-    
-        List<Transito> transitosDelDia = vehiculo.getTransitosDelDia(puesto, fechaHora);
-        double montoConDescuento = bonificacion.aplicarBonificacion(
-            montoBase, vehiculo, transitosDelDia, fechaHora
-        );
-        
-        this.bonificacionAplicada = (montoConDescuento != montoBase);
-        this.montoBonificado = montoBase - montoConDescuento;
-        
-        return montoConDescuento;
-}
+    }
 
     public Date getFechaHora() {
         return fechaHora;
