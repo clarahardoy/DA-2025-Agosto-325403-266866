@@ -31,10 +31,12 @@ public class ControladorLogin {
     @PostMapping("/login-admin")
     public List<Respuesta> loginAdministrador(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) {
         try {
+            // verificar si ya hay alguien logueado en esta sesion
             if(sesionHttp.getAttribute("usuarioAdmin") != null){
-                return Respuesta.lista(new Respuesta("yaLogueado", "/admin/menu.html"));
+                throw new PeajeException("Ud ya está logueado");
             }
             
+            // si hay un propietario logueado, hacerle logout
             if(sesionHttp.getAttribute("usuarioPropietario") != null){
                 logout(sesionHttp);
             }
@@ -49,12 +51,13 @@ public class ControladorLogin {
 
     @PostMapping("/logout")
     public List<Respuesta> logout(HttpSession sesionHttp) throws PeajeException {
-        Object admin = sesionHttp.getAttribute("usuarioAdmin");
-        if (admin != null) {
+        //  admin:  sacarlo de http session 
+        if (sesionHttp.getAttribute("usuarioAdmin") != null) {
             sesionHttp.removeAttribute("usuarioAdmin");
             return Respuesta.lista(new Respuesta("logout", "login-admin"));
         }
         
+        //  propietario: sacar de ambos (http session y lista de sesiones)
         Sesion sesionProp = (Sesion) sesionHttp.getAttribute("usuarioPropietario");
         if (sesionProp != null) {
             Fachada.getInstancia().logout(sesionProp);
