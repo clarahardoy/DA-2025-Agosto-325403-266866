@@ -39,7 +39,7 @@ public abstract class Estado {
 
     public abstract void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException;
 
-    public abstract double aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy);
+    public abstract double aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha);
 
     public abstract void registrarNotificacion(String mensaje);
 

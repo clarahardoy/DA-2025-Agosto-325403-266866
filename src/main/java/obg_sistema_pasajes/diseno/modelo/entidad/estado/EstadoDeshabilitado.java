@@ -43,7 +43,7 @@ public class EstadoDeshabilitado extends Estado {
 
     @Override
     public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
-        throw new PeajeException("El propietario está deshabilitado, no puede recibir bonificaciones");
+        throw new PeajeException("El propietario está deshabilitado, no se le puede asignar bonificaciones");
     }
 
     @Override
@@ -52,8 +52,8 @@ public class EstadoDeshabilitado extends Estado {
     }
 
     @Override
-    public double aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy) {
-        return getPropietario().hacerAplicarDescuentoPorBonificacionesAsignadas(bonificacion, montoTarifa, vehiculo, transitosHoy);
+    public double aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha) {
+        return getPropietario().hacerAplicarDescuentoPorBonificacionesAsignadas(bonificacion, montoTarifa, vehiculo, transitosHoy, fecha);
     }
 
     @Override

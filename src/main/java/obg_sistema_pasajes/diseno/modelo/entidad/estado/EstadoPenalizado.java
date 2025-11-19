@@ -42,7 +42,7 @@ public class EstadoPenalizado extends Estado {
 
     @Override
     public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
-        throw new PeajeException("El propietario está penalizado, no puede recibir bonificaciones");
+        getPropietario().hacerAsignarBonificacion(bonificacion, puesto);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class EstadoPenalizado extends Estado {
     }
 
     @Override
-    public double aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy) {
+    public double aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha) {
         //  penalizados no reciben descuentos aunq tengan bonificaciones asignadas, pagan el 100% igual
         return montoTarifa;
     }

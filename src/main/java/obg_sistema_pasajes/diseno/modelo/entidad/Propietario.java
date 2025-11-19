@@ -103,14 +103,13 @@ public class Propietario extends Usuario {
 
     }
 
-    public double hacerAplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy) {
-        if (bonificacion == null) return 0.0;
-        return bonificacion.calcularMontoConDescuento(montoTarifa, vehiculo, transitosHoy);
-
+    public double hacerAplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha) {
+        if (bonificacion == null) return montoTarifa;
+        return bonificacion.aplicarBonificacion(montoTarifa, vehiculo, transitosHoy, fecha);
     }
 
-    protected void aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy) {
-        estado.aplicarDescuentoPorBonificacionesAsignadas(bonificacion, montoTarifa, vehiculo, transitosHoy);
+    protected void aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha) {
+        estado.aplicarDescuentoPorBonificacionesAsignadas(bonificacion, montoTarifa, vehiculo, transitosHoy, fecha);
     }
 
     public void asignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
@@ -162,7 +161,8 @@ public class Propietario extends Usuario {
             bonificacion, 
             transito.getMontoBase(), 
             vehiculo, 
-            vehiculo.getTransitosDelDia(puesto, fechaHora)
+            vehiculo.getTransitosDelDia(puesto, fechaHora),
+            fechaHora
         );
 
         double descuento = transito.getMontoBase() - montoConDescuento;
