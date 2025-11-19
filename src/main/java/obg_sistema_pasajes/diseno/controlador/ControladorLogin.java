@@ -4,25 +4,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.servlet.http.HttpSession;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import obg_sistema_pasajes.diseno.modelo.Fachada;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
-import obg_sistema_pasajes.diseno.ConexionNavegador;
 
 @RestController
 @RequestMapping("/auth")
 public class ControladorLogin {
 
     @PostMapping("/login-propietario")
-    public List<Respuesta> loginPropietario(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password, @Autowired ConexionNavegador conexionNavegador) {
+    public List<Respuesta> loginPropietario(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) {
         try {
             Sesion sesion = Fachada.getInstancia().loginPropietario(cedula, password);
-            // si hay una sesion activa la cierro (esto cierra el SSE también)
-            logout(sesionHttp, conexionNavegador);
+            logout(sesionHttp);
 
             sesionHttp.setAttribute("usuarioPropietario", sesion);
             return Respuesta.lista(new Respuesta("loginExitoso", "/propietario/tablero.html"));
@@ -32,15 +29,14 @@ public class ControladorLogin {
     }
 
     @PostMapping("/login-admin")
-    public List<Respuesta> loginAdministrador(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password, @Autowired ConexionNavegador conexionNavegador) {
+    public List<Respuesta> loginAdministrador(HttpSession sesionHttp, @RequestParam String cedula, @RequestParam String password) {
         try {
             if(sesionHttp.getAttribute("usuarioAdmin") != null){
                 return Respuesta.lista(new Respuesta("yaLogueado", "/admin/menu.html"));
             }
             
-            // Si hay un propietario logueado, cerrar sesión y SSE
             if(sesionHttp.getAttribute("usuarioPropietario") != null){
-                logout(sesionHttp, conexionNavegador);
+                logout(sesionHttp);
             }
             
             Administrador admin = Fachada.getInstancia().loginAdministrador(cedula, password);
@@ -52,14 +48,7 @@ public class ControladorLogin {
     }
 
     @PostMapping("/logout")
-    public List<Respuesta> logout(HttpSession sesionHttp, @Autowired ConexionNavegador conexionNavegador) throws PeajeException {
-        // Cerrar la conexión SSE antes de limpiar la sesión
-        try {
-            conexionNavegador.cerrarConexion();
-        } catch (Exception e) {
-            // Si no hay conexión SSE, no pasa nada
-        }
-        
+    public List<Respuesta> logout(HttpSession sesionHttp) throws PeajeException {
         Object admin = sesionHttp.getAttribute("usuarioAdmin");
         if (admin != null) {
             sesionHttp.removeAttribute("usuarioAdmin");
