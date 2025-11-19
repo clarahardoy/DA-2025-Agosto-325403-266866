@@ -27,7 +27,6 @@ import observador.Observador;
 
 public class ControladorBonificaciones implements Observador {
 
-    private Administrador administradorSesion;
     private Propietario propietarioActual;
     private final ConexionNavegador conexionNavegador;
 
@@ -42,16 +41,11 @@ public class ControladorBonificaciones implements Observador {
             return Respuesta.lista(new Respuesta("paginaLogin", "/login/administrador.html"));
         }
 
-        if (administradorSesion != null) administradorSesion.quitarObservador(this);
-        administradorSesion = admin;
-        administradorSesion.agregarObservador(this);
-
-
-
-
         List<Respuesta> respuestas = new ArrayList<>(buildInicialData());
 
         if (propietarioActual != null) {
+            propietarioActual.agregarObservador(this);
+            
             respuestas.add(new Respuesta("propietarioNombre", propietarioActual.getNombreCompleto()));
             respuestas.add(new Respuesta("propietarioEstado", propietarioActual.getEstado().getNombre()));
             respuestas.add(new Respuesta("bonificacionesAsignadas", propietarioActual.getDescripcionesBonificaciones()));
@@ -93,9 +87,12 @@ public class ControladorBonificaciones implements Observador {
     
     @PostMapping("/asignar")
     public List<Respuesta> asignarBonificacion(
-            @RequestParam String cedula,
             @RequestParam String bonificacion,
             @RequestParam String puesto) throws PeajeException {
+        
+        if (propietarioActual == null) {
+            throw new PeajeException("Debe buscar al propietario primero");
+        }
         
         if (bonificacion == null || bonificacion.trim().isEmpty()) {
             throw new PeajeException("Debe especificar una bonificación");
@@ -103,11 +100,6 @@ public class ControladorBonificaciones implements Observador {
         
         if (puesto == null || puesto.trim().isEmpty()) {
             throw new PeajeException("Debe especificar un puesto");
-        }
-        
-        // IMPORTANTE: Usar propietarioActual en lugar de buscar de nuevo
-        if (propietarioActual == null || !propietarioActual.getCedula().equals(cedula)) {
-            throw new PeajeException("Debe buscar al propietario primero");
         }
 
         Puesto puestoObj = Fachada.getInstancia().obtenerPuestoPorNombre(puesto);
@@ -123,28 +115,20 @@ public class ControladorBonificaciones implements Observador {
 
     @PostMapping("/vistaCerrada")
     public void salir(){
-        if(administradorSesion!=null) administradorSesion.quitarObservador(this);
         if(propietarioActual!=null) propietarioActual.quitarObservador(this);
     }
 
     @Override
     public void actualizar(Object evento, Observable origen) {
-        
-        if (origen instanceof Administrador) {
-            conexionNavegador.enviarJSON(buildInicialData());
-        } else if (origen instanceof Propietario && propietarioActual != null && origen.equals(propietarioActual)) {
-            if (evento.equals(Propietario.Eventos.CAMBIO_BONIFICACIONES)) {
-                conexionNavegador.enviarJSON(buildBonificacionesAsignadas());
+        if (evento != null && evento.equals(Propietario.Eventos.CAMBIO_BONIFICACIONES)) {
+            if (propietarioActual != null) {
+                conexionNavegador.enviarJSON(Respuesta.lista(bonificacionesAsignadas()));
             }
-        } 
+        }
     }
 
-    private List<Respuesta> buildBonificacionesAsignadas() {
-        if (propietarioActual == null) return new ArrayList<>();
-
-        return Respuesta.lista(
-            new Respuesta("bonificacionesAsignadas", propietarioActual.getDescripcionesBonificaciones())
-        );
+    private Respuesta bonificacionesAsignadas() {
+        return new Respuesta("bonificacionesAsignadas", propietarioActual.getDescripcionesBonificaciones());
     }
 
     

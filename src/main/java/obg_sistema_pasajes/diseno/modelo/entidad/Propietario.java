@@ -15,7 +15,7 @@ public class Propietario extends Usuario {
     public enum Eventos { CAMBIO_BONIFICACIONES, CAMBIO_ESTADO, CAMBIO_NOTIFICACIONES, CAMBIO_TRANSITOS }
     private double saldoActual;
     private double saldoMinimoAlerta;
-    private Estado estado;
+    private Estado estado; 
 
     // Relaciones
     private List<Vehiculo> vehiculos = new ArrayList<>();
