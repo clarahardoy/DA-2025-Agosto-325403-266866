@@ -30,7 +30,7 @@ public class SistemaAcceso {
     public Sesion loginPropietario(String cedula, String pwd) throws PeajeException {
         Propietario usuario = (Propietario) login(cedula, pwd, propietarios);
         
-        if (usuario != null && usuario.estaDeshabilitado()) { 
+        if (usuario != null && !usuario.puedeLoguearse()) { 
             throw new PeajeException("Usuario deshabilitado, no puede ingresar al sistema");
         }
         
@@ -51,7 +51,7 @@ public class SistemaAcceso {
     private Usuario login(String cedula, String pwd, List<?> lista) throws PeajeException {
         Usuario usuario;
         for (Object o : lista) {
-            usuario = (obg_sistema_pasajes.diseno.modelo.entidad.Usuario) o;
+            usuario = (Usuario) o;
             if (usuario.getCedula() != null && usuario.getCedula().equals(cedula) && usuario.getPassword().equals(pwd)) {
                 return usuario;
             }
