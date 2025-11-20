@@ -8,7 +8,6 @@
 		<script src="/utilesVista.js"></script>
 		<script src="/vistaWeb.js"></script>
 		<script src="/sse.js"></script>
-
 	</head>
 	<body>
 		<div class="sidebar">
@@ -29,14 +28,13 @@
 				id="contenidoFrame"
 				src="transito.html"
 				frameborder="0"
-				style="width: 100%; height: 80vh"
+				style="width: 100%; height: 100vh"
 			></iframe>
 		</div>
 		<script>
 			urlIniciarVista = '/menu/vistaConectada';
 			urlCierreVista = '/auth/logout';
-		    urlRegistroSSE = "/menu/registrarSSE";
-
+			urlRegistroSSE = '/menu/registrarSSE';
 
 			const spnNombreCompleto = document.getElementById('nombreCompleto');
 
@@ -51,7 +49,7 @@
 			function mostrar_paginaLogin(url) {
 				window.location.href = url;
 			}
-			
+
 			function mostrar_logout(pagina) {
 				window.location.href = '/login/administrador.html';
 			}
@@ -59,37 +57,39 @@
 			function logout() {
 				submit(urlCierreVista);
 			}
-		function procesarErrorSubmit(status, text) {
+			function procesarErrorSubmit(status, text) {
 				if (status == 400) {
 					//El usuario no ha iniciado sesion
-					mostrar_paginaLogin( '/login/administrador.html');
+					mostrar_paginaLogin('/login/administrador.html');
 				}
-		}
+			}
 
-		        //Cuando llega un mensaje SSE lo delego al iFrame actual como una respuesta del controlador
-        function procesarMensajeSSE(mensaje) {
-  
-            var iframe = document.getElementById('contenidoFrame');
-            var iframeWindow = iframe.contentWindow;
-            iframeWindow.procesarResultadosSubmit(mensaje); //asumo que el iFrame tiene vistaWeb.js incluida
-        }
-        
-        //Se ejecuta cuando se cierra la conexion desde el servidor
-        //Si no se define esta funcion, por defecto se "borra" la pagina 
-        function conexionSSECerrada(event){
-              cerrar();
-        }
-        async function cerrar(){
-            let respuesta = await mostrarConfirmacion("Se ha cerrado la aplicacion en esta ventana", "Intentar volver a abrirla", "Cerrar");
-            if (respuesta) {
-                // Intentar volver a abrirla -> redirigir al login para que vuelva a entrar
-                mostrar_logout('login-admin');
-            } else {
-                // Cerrar -> borrar la página
-                document.body.innerHTML = '';
-            }
-        }
+			//Cuando llega un mensaje SSE lo delego al iFrame actual como una respuesta del controlador
+			function procesarMensajeSSE(mensaje) {
+				var iframe = document.getElementById('contenidoFrame');
+				var iframeWindow = iframe.contentWindow;
+				iframeWindow.procesarResultadosSubmit(mensaje); //asumo que el iFrame tiene vistaWeb.js incluida
+			}
 
+			//Se ejecuta cuando se cierra la conexion desde el servidor
+			//Si no se define esta funcion, por defecto se "borra" la pagina
+			function conexionSSECerrada(event) {
+				cerrar();
+			}
+			async function cerrar() {
+				let respuesta = await mostrarConfirmacion(
+					'Se ha cerrado la aplicacion en esta ventana',
+					'Intentar volver a abrirla',
+					'Cerrar'
+				);
+				if (respuesta) {
+					// Intentar volver a abrirla -> redirigir al login para que vuelva a entrar
+					mostrar_logout('login-admin');
+				} else {
+					// Cerrar -> borrar la página
+					document.body.innerHTML = '';
+				}
+			}
 		</script>
 	</body>
 </html>
