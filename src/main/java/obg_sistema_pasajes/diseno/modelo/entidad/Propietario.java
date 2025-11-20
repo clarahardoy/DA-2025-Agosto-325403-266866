@@ -251,11 +251,6 @@ public class Propietario extends Usuario {
         avisar(Eventos.CAMBIO_NOTIFICACIONES);
     }
 
-    private String obtenerFechaHoraActual() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return sdf.format(new Date());
-    }
-
     protected void hacerRegistrarNotificacion(String mensaje) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String fechaHora = formatter.format(new java.util.Date());
