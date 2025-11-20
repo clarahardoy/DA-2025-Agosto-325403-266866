@@ -30,6 +30,7 @@ import observador.Observable;
 public class ControladorTransito implements Observador {
 
     private Administrador administradorSesion;
+    private Puesto puestoSeleccionado;
     private final ConexionNavegador conexionNavegador;
 
     public ControladorTransito(@Autowired ConexionNavegador conexionNavegador) {
@@ -56,14 +57,26 @@ public class ControladorTransito implements Observador {
         );
     }
 
+    @PostMapping("/seleccionar-puesto")
+    public List<Respuesta> seleccionarPuesto(@RequestParam String puestoNombre) throws PeajeException {
+        this.puestoSeleccionado = Fachada.getInstancia().obtenerPuestoPorNombre(puestoNombre);
+        if (this.puestoSeleccionado == null) {
+            throw new PeajeException("Puesto no encontrado");
+        }
+        return Respuesta.lista(new Respuesta("puestoSeleccionado", "OK"));
+    }
+
     @PostMapping("/emular")
     public List<Respuesta> emularTransito(
-            @RequestParam String puestoNombre,
             @RequestParam String matricula,
             @RequestParam String fechaHora
             ) {
         
         try {
+            if (this.puestoSeleccionado == null) {
+                throw new PeajeException("Debe seleccionar un puesto");
+            }
+            
             Fachada fachada = Fachada.getInstancia();
             
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -79,7 +92,7 @@ public class ControladorTransito implements Observador {
                 throw new PeajeException("El vehículo no tiene propietario asignado");
             }
 
-            Puesto puesto = fachada.obtenerPuestoPorNombre(puestoNombre);
+            Puesto puesto = this.puestoSeleccionado;
             Transito transito = propietario.registrarTransito(vehiculo, puesto, fechaHoraTransito);
 
             return Respuesta.lista(

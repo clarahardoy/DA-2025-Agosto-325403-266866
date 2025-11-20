@@ -88,26 +88,24 @@
 			urlIniciarVista = '/transito/vista-conectada';
 			urlCierreVista = '/transito/vistaCerrada';
 
-			let puestosConTarifas = [];
-
 			function mostrar_puestos(puestos) {
-				puestosConTarifas = puestos;
 				const select = document.getElementById('puesto');
 				select.innerHTML = '<option value="">Seleccione un puesto</option>';
-				puestos.forEach((p, index) => {
+				puestos.forEach((p) => {
 					const option = document.createElement('option');
-					option.value = index;
+					option.value = p.nombre;
 					option.textContent = p.nombre;
+					option.dataset.tarifas = JSON.stringify(p.tarifas);
 					select.appendChild(option);
 				});
 			}
 
 			function cargarTarifasPuesto() {
 				const selectPuesto = document.getElementById('puesto');
-				const index = selectPuesto.value;
+				const opcionSeleccionada = selectPuesto.selectedOptions[0];
 				const tbody = document.getElementById('listaTarifas');
 
-				if (index === '') {
+				if (!opcionSeleccionada || selectPuesto.value === '') {
 					tbody.innerHTML = `
 						<tr>
 							<td colspan="2" style="text-align: center; color: #999">
@@ -118,11 +116,16 @@
 					return;
 				}
 
-				const puesto = puestosConTarifas[index];
+				submit(
+					'/transito/seleccionar-puesto',
+					`puestoNombre=${encodeURIComponent(selectPuesto.value)}`
+				);
+
+				const tarifas = JSON.parse(opcionSeleccionada.dataset.tarifas || '[]');
 				tbody.innerHTML = '';
 
-				if (puesto.tarifas && puesto.tarifas.length > 0) {
-					puesto.tarifas.forEach((t) => {
+				if (tarifas && tarifas.length > 0) {
+					tarifas.forEach((t) => {
 						const tr = document.createElement('tr');
 						tr.innerHTML = `
 						<td>${t.categoria.nombreCategoria}</td>
@@ -161,12 +164,9 @@
 					return;
 				}
 
-				const puestoSeleccionado = puestosConTarifas[puesto];
 				submit(
 					'/transito/emular',
-					`puestoNombre=${encodeURIComponent(
-						puestoSeleccionado.nombre
-					)}&matricula=${encodeURIComponent(
+					`matricula=${encodeURIComponent(
 						matricula
 					)}&fechaHora=${encodeURIComponent(fechaHora)}`
 				);
@@ -206,13 +206,14 @@
 				await mostrarMensaje(text);
 			}
 
-
+			function mostrar_puestoSeleccionado(mensaje) {
+				console.log('Puesto seleccionado en el servidor');
+			}
 
 			// Maneja la respuesta inicial del servidor indicando que la vista está conectada  (error consola)-----------------------------
 			function mostrar_vistaConectada(mensaje) {
 				console.log('vistaConectada:', mensaje);
 			}
-
 		</script>
 	</body>
 </html>
