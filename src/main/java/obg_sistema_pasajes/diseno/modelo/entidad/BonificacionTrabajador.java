@@ -1,11 +1,8 @@
-package obg_sistema_pasajes.diseno.modelo.entidad.bonificacion;
+package obg_sistema_pasajes.diseno.modelo.entidad;
 
 import java.util.List;
 import java.util.Date;
 import java.util.Calendar;
-
-import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
-import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
 
 public class BonificacionTrabajador extends Bonificacion {
     

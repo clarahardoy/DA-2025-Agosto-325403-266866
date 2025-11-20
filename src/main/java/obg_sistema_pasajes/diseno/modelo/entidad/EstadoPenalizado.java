@@ -1,42 +1,39 @@
-package obg_sistema_pasajes.diseno.modelo.entidad.estado;
+package obg_sistema_pasajes.diseno.modelo.entidad;
 
-import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
-import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
-import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
+
 import java.util.Date;
 import java.util.List;
-import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
 
-public class EstadoSuspendido extends Estado {
+public class EstadoPenalizado extends Estado {
 
     
-    public EstadoSuspendido(Propietario propietario) {
-        super(propietario, "SUSPENDIDO");
+    public EstadoPenalizado(Propietario propietario) {
+        super(propietario, "PENALIZADO");
     }    @Override
-    public void suspender() throws PeajeException {
-        throw new PeajeException("El propietario ya está suspendido");
+    public void penalizar() throws PeajeException {
+        throw new PeajeException("El propietario ya está penalizado");
     }
 
     @Override
     public void habilitar() throws PeajeException {
         getPropietario().cambiarEstado(new EstadoHabilitado(getPropietario()));
     }
-
+    
+    
     @Override
     public void deshabilitar() throws PeajeException {
         getPropietario().cambiarEstado(new EstadoDeshabilitado(getPropietario()));
     }
-    
+
     @Override
-    public void penalizar() throws PeajeException {
-        getPropietario().cambiarEstado(new EstadoPenalizado(getPropietario()));
+    public void suspender() throws PeajeException {
+        getPropietario().cambiarEstado(new EstadoSuspendido(getPropietario()));
     }
 
     @Override
     public boolean puedeLoguearse() throws PeajeException {
-        return true;
+        return false;
     }
 
     @Override
@@ -46,16 +43,17 @@ public class EstadoSuspendido extends Estado {
 
     @Override
     public Transito registrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException {
-        throw new PeajeException("El propietario del vehículo está suspendido, no puede realizar tránsitos");
+        return getPropietario().hacerRegistrarTransito(vehiculo, puesto, fechaHora);
     }
 
     @Override
     public double aplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha) {
-        return getPropietario().hacerAplicarDescuentoPorBonificacionesAsignadas(bonificacion, montoTarifa, vehiculo, transitosHoy, fecha);
+        //  penalizados no reciben descuentos aunq tengan bonificaciones asignadas, pagan el 100% igual
+        return montoTarifa;
     }
 
     @Override
     public void registrarNotificacion(String mensaje) {
-        getPropietario().hacerRegistrarNotificacion(mensaje);
+        //  propietarios penalizados no reciben notificaciones
     }
 }

@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import obg_sistema_pasajes.diseno.modelo.entidad.*;
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.BonificacionExonerado;
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.BonificacionFrecuente;
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.BonificacionTrabajador;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 
 public class SistemaBonificacion {

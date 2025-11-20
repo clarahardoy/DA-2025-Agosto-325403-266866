@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
+import obg_sistema_pasajes.diseno.modelo.entidad.TipoEstado;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import obg_sistema_pasajes.diseno.modelo.entidad.Usuario;
-import obg_sistema_pasajes.diseno.modelo.entidad.estado.TipoEstado;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 
 public class SistemaAcceso {

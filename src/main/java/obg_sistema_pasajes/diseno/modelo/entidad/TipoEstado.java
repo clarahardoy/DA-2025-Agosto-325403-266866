@@ -1,4 +1,4 @@
-package obg_sistema_pasajes.diseno.modelo.entidad.estado;
+package obg_sistema_pasajes.diseno.modelo.entidad;
 
 public class TipoEstado {
     

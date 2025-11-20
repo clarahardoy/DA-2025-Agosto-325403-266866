@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Scope;
 import observador.Observador;
 import obg_sistema_pasajes.diseno.ConexionNavegador;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
-import obg_sistema_pasajes.diseno.modelo.entidad.estado.TipoEstado;
+
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +15,7 @@ import java.util.List;
 import observador.Observable;
 import org.springframework.web.bind.annotation.RequestParam;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
+import obg_sistema_pasajes.diseno.modelo.entidad.TipoEstado;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
 import obg_sistema_pasajes.diseno.modelo.Fachada;
 import obg_sistema_pasajes.diseno.dto.NombreDto;

@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
-import obg_sistema_pasajes.diseno.modelo.entidad.estado.Estado;
-import obg_sistema_pasajes.diseno.modelo.entidad.estado.EstadoHabilitado;
-
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -89,7 +85,7 @@ public class Propietario extends Usuario {
 
 
 //---------------------------- BONIFICACIONES -------------------------------------------
-    public void hacerAsignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
+    protected void hacerAsignarBonificacion(Bonificacion bonificacion, Puesto puesto) throws PeajeException {
         // Verificar si ya tiene una bonificación para ese puesto
          if (tieneBonificacionEnPuesto(puesto)) {
             throw new PeajeException("Ya tiene una bonificación asignada para ese puesto");
@@ -103,7 +99,7 @@ public class Propietario extends Usuario {
 
     }
 
-    public double hacerAplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha) {
+    protected double hacerAplicarDescuentoPorBonificacionesAsignadas(Bonificacion bonificacion, double montoTarifa, Vehiculo vehiculo, List<Transito> transitosHoy, Date fecha) {
         if (bonificacion == null) return montoTarifa;
         return bonificacion.aplicarBonificacion(montoTarifa, vehiculo, transitosHoy, fecha);
     }
@@ -148,7 +144,7 @@ public class Propietario extends Usuario {
         return null;
     }
 
-    public Transito hacerRegistrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException {
+    protected Transito hacerRegistrarTransito(Vehiculo vehiculo, Puesto puesto, Date fechaHora) throws PeajeException {
         if (!this.vehiculos.contains(vehiculo)) {
             throw new PeajeException("El vehículo no pertenece a este propietario");
         }
@@ -260,7 +256,7 @@ public class Propietario extends Usuario {
         return sdf.format(new Date());
     }
 
-    public void hacerRegistrarNotificacion(String mensaje) {
+    protected void hacerRegistrarNotificacion(String mensaje) {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String fechaHora = formatter.format(new java.util.Date());
         String mensajeCompleto = "[" + fechaHora + "] " + mensaje;

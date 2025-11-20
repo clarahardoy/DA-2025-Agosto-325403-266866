@@ -6,16 +6,17 @@ import obg_sistema_pasajes.diseno.modelo.sistema.SistemaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.sistema.SistemaBonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Sesion;
 import obg_sistema_pasajes.diseno.modelo.entidad.Tarifa;
+import obg_sistema_pasajes.diseno.modelo.entidad.TipoEstado;
 import obg_sistema_pasajes.diseno.modelo.entidad.Administrador;
+import obg_sistema_pasajes.diseno.modelo.entidad.Bonificacion;
 import obg_sistema_pasajes.diseno.modelo.entidad.CategoriaVehiculo;
 import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
 import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
 import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 
 import java.util.ArrayList;
 import java.util.List;
-import obg_sistema_pasajes.diseno.modelo.entidad.estado.TipoEstado;
+
 import obg_sistema_pasajes.diseno.exception.PeajeException;
 import observador.Observable;
 

@@ -1,11 +1,7 @@
-package obg_sistema_pasajes.diseno.modelo.entidad.estado;
+package obg_sistema_pasajes.diseno.modelo.entidad;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
-import obg_sistema_pasajes.diseno.modelo.entidad.Propietario;
-import obg_sistema_pasajes.diseno.modelo.entidad.Puesto;
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
-import obg_sistema_pasajes.diseno.modelo.entidad.Vehiculo;
-import obg_sistema_pasajes.diseno.modelo.entidad.Transito;
+
 import java.util.Date;
 import java.util.List;
 

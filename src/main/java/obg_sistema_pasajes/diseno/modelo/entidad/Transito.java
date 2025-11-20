@@ -3,7 +3,6 @@ import java.util.Date;
 import java.util.Comparator;
 
 import obg_sistema_pasajes.diseno.exception.PeajeException;
-import obg_sistema_pasajes.diseno.modelo.entidad.bonificacion.Bonificacion;
 
 
 public class Transito {
@@ -107,5 +106,4 @@ public class Transito {
             return transito2.getFechaHora().compareTo(transito1.getFechaHora());
         };
     }
-            
 }
