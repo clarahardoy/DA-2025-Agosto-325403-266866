@@ -33,7 +33,7 @@ public class EstadoPenalizado extends Estado {
 
     @Override
     public boolean puedeLoguearse() throws PeajeException {
-        return false;
+        return true;
     }
 
     @Override
